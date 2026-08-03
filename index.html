@@ -52,9 +52,9 @@
     .feature .icon { color:var(--brass); display:block; font-size:1.3rem; margin-bottom:.65rem; } .feature h3 { font-size:1rem; margin-bottom:.35rem; } .feature p { color:var(--steel); font-size:.87rem; }
     .download { background:linear-gradient(145deg,#151e29,#101720); border:1px solid var(--line); border-radius:22px; padding:clamp(2rem,5vw,4rem); text-align:center; }
     .store-banner { position:fixed; z-index:10; left:0; right:0; bottom:0; display:flex; gap:.55rem; justify-content:center; padding:.55rem max(1rem, env(safe-area-inset-right)) calc(.55rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); background:rgba(8,12,18,.96); border-top:1px solid rgba(255,255,255,.14); box-shadow:0 -12px 34px rgba(0,0,0,.35); backdrop-filter:blur(14px); }
-    .store-banner a { flex:1 1 0; max-width:220px; display:flex; align-items:center; justify-content:center; gap:.45rem; min-height:43px; border:1px solid rgba(255,255,255,.15); border-radius:8px; background:#141c28; color:var(--white); font-size:.78rem; font-weight:800; }
+    .store-banner a { flex:1 1 0; max-width:220px; height:56px; display:flex; align-items:center; justify-content:center; gap:.45rem; border:1px solid rgba(255,255,255,.15); border-radius:8px; background:#141c28; color:var(--white); font-size:.78rem; font-weight:800; }
     .store-banner a:last-child { border:none; background:transparent; padding:0; overflow:hidden; }
-    .store-banner a:last-child img { height:100%; width:100%; object-fit:contain; }
+    .store-banner a:last-child img { height:100%; width:auto; max-width:100%; object-fit:contain; }
     .store-banner svg { width:28px; height:28px; flex:none; }
     .store-banner small { display:block; color:#93A3B5; font-size:.68rem; font-weight:600; letter-spacing:.03em; text-transform:uppercase; line-height:1.1; }
     .store-banner strong { display:block; font-size:1.02rem; line-height:1.25; }
