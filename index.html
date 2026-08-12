@@ -118,25 +118,19 @@
       const form = this;
       const statusDiv = document.getElementById('feedbackStatus');
       const submitBtn = form.querySelector('button[type="submit"]');
-      
+
       const formData = new FormData(form);
-      const data = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        type: formData.get('type'),
-        message: formData.get('message')
-      };
-      
+      formData.append('access_key', 'f8b36a6e-2e2d-4c4a-bd04-9ce1be3b7b0f');
+
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
-      
+
       try {
-        const response = await fetch('https://formspree.io/e/fdnyscheduler@gmail.com', {
+        const response = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: formData
         });
-        
+
         if (response.ok) {
           statusDiv.textContent = '✓ Thanks! Your feedback has been sent.';
           statusDiv.className = 'feedback-status success';
