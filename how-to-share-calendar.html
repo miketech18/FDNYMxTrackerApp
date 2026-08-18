@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Share Your Calendar | FDNY Mutual Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080c12;
+      --surface: #0f1319;
+      --line: #1a2332;
+      --text: #c9d0da;
+      --white: #ffffff;
+      --red: #e53935;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      border-bottom: 1px solid var(--line);
+      background: rgba(8, 12, 18, .94);
+      backdrop-filter: blur(14px);
+    }
+
+    nav .wrap {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wrap {
+      width: min(100% - 32px, 1100px);
+      margin: 0 auto;
+    }
+
+    nav .brand {
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+    }
+
+    nav strong {
+      color: var(--red);
+    }
+
+    nav .release {
+      color: var(--text);
+      font-size: .8rem;
+      margin-left: 2rem;
+    }
+
+    .content {
+      padding: 3rem 0;
+    }
+
+    .content .wrap {
+      max-width: 900px;
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      color: var(--white);
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 3rem;
+    }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .step-number {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      background: var(--red);
+      color: var(--white);
+      border-radius: 50%;
+      text-align: center;
+      line-height: 40px;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+    }
+
+    .step h2 {
+      font-size: 1.4rem;
+      color: var(--white);
+      margin-bottom: 1rem;
+      margin-top: 0;
+    }
+
+    .step p {
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .step img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      margin: 1.5rem 0;
+    }
+
+    .step-content {
+      display: grid;
+      gap: 2rem;
+    }
+
+    @media (max-width: 720px) {
+      h1 { font-size: 1.8rem; }
+      .step { padding: 1.5rem; }
+      .content .wrap { width: 100%; padding: 0 1rem; }
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 1.8rem 0 2.5rem;
+      color: #708093;
+      font-size: .82rem;
+      text-align: center;
+      margin-top: 4rem;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 2rem;
+      color: var(--red);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    .info-box {
+      background: rgba(229, 57, 53, 0.1);
+      border-left: 4px solid var(--red);
+      padding: 1rem;
+      border-radius: 4px;
+      margin: 1.5rem 0;
+    }
+
+    .info-box strong {
+      color: var(--red);
+    }
+  </style>
+</head>
+<body>
+  <nav><div class="wrap"><a class="brand" href="index.html">FDNY <strong>MUTUAL</strong> Tracker</a></div></nav>
+
+  <div class="content"><div class="wrap">
+    <a href="index.html" class="back-link">← Back to Home</a>
+
+    <h1>How to Share Your Calendar</h1>
+    <p class="subtitle">Share your FDNY schedule with family members so they can subscribe to your calendar in Google Calendar, Apple Calendar, or Outlook.</p>
+
+    <div class="step">
+      <div class="step-number">1</div>
+      <h2>Open Settings & Find Share Calendar</h2>
+      <p>Open the FDNY Mutual Tracker app and tap <strong>Settings</strong> at the bottom. Scroll down to <strong>"Data & Maintenance"</strong> section and tap <strong>"Share Calendar"</strong>.</p>
+      <img src="../../../fdnymxtrackerapp/Assets/step-1-settings.png" alt="Settings screen showing Share Calendar option">
+    </div>
+
+    <div class="step">
+      <div class="step-number">2</div>
+      <h2>Generate Your Share Link</h2>
+      <p>Tap the <strong>"Generate New Link"</strong> button (or <strong>"Share Link"</strong> if you already have one). This creates a secure, shareable URL that family members can use to subscribe to your calendar.</p>
+      <img src="../../../fdnymxtrackerapp/Assets/step-2-generate-link.png" alt="Share Calendar modal showing the share link">
+    </div>
+
+    <div class="step">
+      <div class="step-number">3</div>
+      <h2>Copy the Link</h2>
+      <p>The share link will appear in a text box. Tap and hold to select the entire URL, then copy it. Your link is now ready to share with family members or anyone who needs to see your schedule.</p>
+      <div class="info-box">
+        <strong>ℹ️ Note:</strong> This link is unique to you. You can revoke it anytime by tapping "Stop Sharing."
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-number">4</div>
+      <h2>Open Google Calendar</h2>
+      <p>Go to <a href="https://calendar.google.com" target="_blank" style="color: var(--red);">calendar.google.com</a> and sign in. Click the <strong>"+"</strong> button next to "Other calendars" on the left sidebar.</p>
+      <img src="../../../fdnymxtrackerapp/Assets/step-3-google-calendar-menu.png" alt="Google Calendar menu showing Subscribe to calendar option">
+    </div>
+
+    <div class="step">
+      <div class="step-number">5</div>
+      <h2>Subscribe to Calendar</h2>
+      <p>Select <strong>"Subscribe to calendar"</strong> from the menu that appears.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-number">6</div>
+      <h2>Paste the Share Link</h2>
+      <p>A dialog box will appear asking for a calendar URL. Paste the share link you copied from the FDNY Mutual Tracker app into the <strong>"URL of calendar"</strong> field.</p>
+      <img src="../../../fdnymxtrackerapp/Assets/step-4-paste-url.png" alt="Google Calendar From URL dialog with calendar link pasted">
+    </div>
+
+    <div class="step">
+      <div class="step-number">7</div>
+      <h2>Add the Calendar</h2>
+      <p>Click <strong>"Add calendar"</strong>. Google Calendar will now subscribe to your FDNY schedule and display it automatically.</p>
+    </div>
+
+    <div class="step">
+      <div class="step-number">8</div>
+      <h2>Done!</h2>
+      <p>Your calendar is now live in Google Calendar. Every time you update your schedule in the FDNY Mutual Tracker app (add tours, OT, mutual exchanges, etc.), the changes will automatically sync to your shared calendar.</p>
+      <div class="info-box">
+        <strong>✓ Works with:</strong> Google Calendar, Apple Calendar, Outlook, and any calendar app that supports iCalendar (.ics) format.
+      </div>
+    </div>
+
+    <div class="step">
+      <h2>Revoke or Stop Sharing</h2>
+      <p>If you no longer want to share your calendar, go back to <strong>Settings → Share Calendar</strong> and tap <strong>"Stop Sharing"</strong>. The link will stop working immediately.</p>
+    </div>
+
+  </div></div>
+
+  <footer><div class="wrap">© 2026 FDNY Mutual Tracker · Built by an active FDNY firefighter.</div></footer>
+</body>
+</html>

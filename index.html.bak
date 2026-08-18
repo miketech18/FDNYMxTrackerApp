@@ -79,7 +79,7 @@
 </style>
 </head>
 <body>
-  <nav><div class="wrap"><a class="brand" href="#top">FDNY <strong>Mutual</strong> Tracker</a><div style="display:flex; gap:.8rem; align-items:center;"><span class="release">v3.23.0</span><a href="how-to-share-calendar.html" style="color:#c9d0da; text-decoration:none; font-size:.85rem; font-weight:500; padding-right:1rem;">How to Share</a><a href="#feedback-section" class="nav-feedback">Send Feedback</a></div></div></nav>
+  <nav><div class="wrap"><a class="brand" href="#top">FDNY <strong>Mutual</strong> Tracker</a><div style="display:flex; gap:.8rem; align-items:center;"><span class="release">v3.23.0</span><a href="#feedback-section" class="nav-feedback">Send Feedback</a></div></div></nav>
   <main id="top">
     <header><div class="wrap hero">
       <div><p class="kicker">v3.23.0 is 10-84</p><h1>Your tours.<br>Your mutuals.<br><em>Your crew.</em></h1><p class="lede">The 25-group calendar, mutuals, OT tracking, and firehouse tools built by an FDNY firefighter—now with a faster way to find any FDNY unit.</p></div>
