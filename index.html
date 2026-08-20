@@ -20,6 +20,8 @@
     .brand { font:400 1.4rem/1 'Bebas Neue',sans-serif; letter-spacing:.06em; } .brand strong { color:var(--red); font-weight:400; }
     .nav-feedback { padding:.5rem 1rem; border-radius:8px; background:var(--red); color:white; font-weight:800; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; transition:all .2s; display:inline-block; }
     .nav-feedback:hover { background:#eb2438; transform:translateY(-2px); }
+    .nav-feedback-button { background:transparent; border:2px solid #98222c; color:white; box-shadow:inset 0 1px 0 rgba(255,255,255,.3); }
+    .nav-feedback-button:hover { border-color:#b8323d; background:rgba(152,34,44,.1); transform:translateY(-2px); }
     .release { color:#ff989d; border:1px solid rgba(206,17,38,.42); background:rgba(206,17,38,.12); border-radius:999px; padding:.32rem .72rem; font-size:.7rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
     header { overflow:hidden; background:radial-gradient(ellipse 80% 75% at 76% 18%,#1c3346 0%,var(--night) 67%); border-bottom:1px solid var(--line); }
     .hero { display:grid; grid-template-columns:1.08fr .92fr; gap:clamp(2rem,7vw,6rem); align-items:center; padding:clamp(3.5rem,8vw,7rem) 0; }
@@ -80,7 +82,7 @@
 </style>
 </head>
 <body>
-  <nav><div class="wrap"><a class="brand" href="#top"><img src="Assets/app-icon-rounded.png" alt="FDNY Mutual Tracker" style="height: 120px; width: auto;"></a><div style="display:flex; gap:.8rem; align-items:center;"><span class="release">v4.0.1</span><div style="display:flex; flex-direction:column; gap:.4rem; align-items:stretch;"><a href="#feedback-section" class="nav-feedback">Send Feedback</a><a href="how-to-share-calendar.html" class="nav-feedback">Share calendar with Family</a></div></div></div></nav>
+  <nav><div class="wrap"><a class="brand" href="#top"><img src="Assets/app-icon-rounded.png" alt="FDNY Mutual Tracker" style="height: 120px; width: auto;"></a><div style="display:flex; gap:.8rem; align-items:center;"><span class="release">v4.0.1</span><div style="display:flex; flex-direction:column; gap:.4rem; align-items:stretch;"><a href="#feedback-section" class="nav-feedback nav-feedback-button">Send Feedback</a><a href="how-to-share-calendar.html" class="nav-feedback">Share calendar with Family</a></div></div></div></nav>
   <main id="top">
     <header><div class="wrap hero">
       <div><p class="kicker">v4.0.1 is 10-84</p><h1>Your tours.<br>Your mutuals.<br><em>Your crew.</em></h1><p class="lede">The 25-group calendar, mutuals, OT tracking, and firehouse tools built by an FDNY firefighter—now with a faster way to find any FDNY unit.</p></div>
