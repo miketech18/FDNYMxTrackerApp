@@ -17,7 +17,9 @@
     .wrap { width:min(1100px,calc(100% - 40px)); margin:auto; }
     nav { position:sticky; top:0; z-index:3; border-bottom:1px solid var(--line); background:rgba(8,12,18,.94); backdrop-filter:blur(14px); }
     nav .wrap { min-height:64px; padding:.6rem 0; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
-    .brand { font:400 1.4rem/1 'Bebas Neue',sans-serif; letter-spacing:.06em; } .brand strong { color:var(--red); font-weight:400; }
+    .brand { font:400 1.4rem/1 'Bebas Neue',sans-serif; letter-spacing:.06em; display:flex; flex-direction:column; align-items:center; gap:.4rem; } .brand strong { color:var(--red); font-weight:400; }
+    .crew-redesign-banner { color:#FFD700; font-size:1.1rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; text-shadow:0 0 12px rgba(255,215,0,.4); animation:crewPulse 3s ease-in-out infinite; }
+    @keyframes crewPulse { 0%,100%{ opacity:1; } 50%{ opacity:.2; } }
     .nav-feedback { padding:.5rem 1rem; border-radius:8px; background:var(--red); color:white; font-weight:800; font-size:.75rem; letter-spacing:.08em; text-transform:uppercase; transition:all .2s; display:inline-block; }
     .nav-feedback:hover { background:#eb2438; transform:translateY(-2px); }
     .release { color:#ff989d; border:1px solid rgba(206,17,38,.42); background:rgba(206,17,38,.12); border-radius:999px; padding:.32rem .72rem; font-size:.7rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
@@ -80,7 +82,7 @@
 </style>
 </head>
 <body>
-  <nav><div class="wrap"><a class="brand" href="#top"><img src="Assets/app-icon-rounded.png" alt="FDNY Mutual Tracker" style="height: 90px; width: auto;"></a><div style="display:flex; gap:.8rem; align-items:center;"><span class="release">v4.4.20</span><div style="display:flex; flex-direction:column; gap:.4rem; align-items:stretch;"><a href="#feedback-section" class="nav-feedback">Send Feedback</a><a href="how-to-share-calendar.html" class="nav-feedback">Share calendar with Family</a></div></div></div></nav>
+  <nav><div class="wrap"><a class="brand" href="#top"><img src="Assets/app-icon-rounded.png" alt="FDNY Mutual Tracker" style="height: 90px; width: auto;"><span class="crew-redesign-banner">My Crew - in App Mutual Swaps - Redesign coming soon!</span></a><div style="display:flex; gap:.8rem; align-items:center;"><span class="release">v4.4.20</span><div style="display:flex; flex-direction:column; gap:.4rem; align-items:stretch;"><a href="#feedback-section" class="nav-feedback">Send Feedback</a><a href="how-to-share-calendar.html" class="nav-feedback">Share calendar with Family</a></div></div></div></nav>
   <main id="top">
     <header><div class="wrap hero">
       <div><p class="kicker">v4.4.20 is 10-84</p><h1>Your tours.<br>Your mutuals.<br><em>Your crew.</em></h1><p class="lede">The 25-group calendar, mutuals, OT tracking, and firehouse tools built by an FDNY firefighter—now with a faster way to find any FDNY unit.</p></div>
