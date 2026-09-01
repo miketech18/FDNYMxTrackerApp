@@ -213,7 +213,7 @@
 
       function restartBenefitAutoplay() {
         clearInterval(benefitTimer);
-        if (!benefitReducedMotion) benefitTimer = setInterval(advanceBenefit, 1300);
+        if (!benefitReducedMotion) benefitTimer = setInterval(advanceBenefit, 1500);
       }
 
       benefitsCarousel.addEventListener('mouseenter', () => clearInterval(benefitTimer));
