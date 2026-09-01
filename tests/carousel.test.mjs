@@ -20,4 +20,5 @@ test('app screenshot carousel includes all numbered slides in order', async () =
   assert.match(html, /class="phone-frame"/);
   assert.match(html, /prefers-reduced-motion/);
   assert.match(html, /setInterval\(\(\) => showSlide\(current \+ 1\), 3000\)/);
+  assert.doesNotMatch(html, /<div class="alert-banner">/);
 });
