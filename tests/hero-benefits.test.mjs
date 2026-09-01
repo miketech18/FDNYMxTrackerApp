@@ -9,7 +9,7 @@ test('hero uses a fast vertical benefits carousel with the approved copy', () =>
 
   assert.deepEqual(benefits, [
     'Your calendar updates the family calendar automatically.',
-    'App compares the OT Sheet with last pay period marks and finds missing marks in City Time.',
+    'Compares OT Sheet for missing marks in City Time.',
     "OT Log: know when you're getting paid for last week's 6x MSOT.",
     'Detailed Mutual tracking by name.',
     'RSOT notifications on your home screen.',
