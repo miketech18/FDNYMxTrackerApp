@@ -22,5 +22,5 @@ test('hero uses a fast vertical benefits carousel with the approved copy', () =>
   ]);
   assert.match(html, /data-benefits-carousel/);
   assert.match(html, /prefers-reduced-motion/);
-  assert.match(html, /setInterval\(advanceBenefit, 1800\)/);
+  assert.match(html, /setInterval\(advanceBenefit, 1300\)/);
 });
