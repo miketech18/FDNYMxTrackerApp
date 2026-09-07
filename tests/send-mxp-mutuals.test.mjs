@@ -21,6 +21,8 @@ test('Send MxP Mutuals page is copied locally without an embedded frame', () => 
   assert.doesNotMatch(app, /supabase\.co\/storage\/v1\/object\/sign/);
   assert.match(app, /screenshot:"Send-MxP-Mutuals-assets\/step-4\.2\.png"/);
   assert.match(app, /screenshot2:"Send-MxP-Mutuals-assets\/step-4\.3\.png"/);
+  assert.doesNotMatch(app, /Opposite Sets Required/);
+  assert.doesNotMatch(app, /What.s the difference between MX On and MX Off\?/);
   assert.match(app, /screenshot-scroll-multi/);
   assert.match(app, /screenshot-shuffle/);
   assert.match(styles, /\.screenshot-scroll-multi\{[^}]*overflow-x:auto/);
