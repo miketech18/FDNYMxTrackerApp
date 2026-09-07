@@ -10,6 +10,8 @@ const home = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 
 test('Send MxP Mutuals page is copied locally without an embedded frame', () => {
   assert.doesNotMatch(page, /<iframe\b/);
+  assert.doesNotMatch(page, /<script type="module"[^>]+index-DHbFsI3A\.js/);
+  assert.match(page, /<script[^>]+src="Send-MxP-Mutuals-assets\/index-DHbFsI3A\.js"/);
   assert.match(page, /src="Send-MxP-Mutuals-assets\/index-DHbFsI3A\.js"/);
   assert.match(page, /href="Send-MxP-Mutuals-assets\/index-B_kB5OCs\.css"/);
   assert.doesNotMatch(page, /pgug54-jcp3fvupf\.vercel\.app/);
