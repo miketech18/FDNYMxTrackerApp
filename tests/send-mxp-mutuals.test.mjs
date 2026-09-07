@@ -4,6 +4,8 @@ import { readFile } from 'node:fs/promises';
 
 const page = await readFile(new URL('../Send-MxP-Mutuals.html', import.meta.url), 'utf8');
 const app = await readFile(new URL('../Send-MxP-Mutuals-assets/index-DHbFsI3A.js', import.meta.url), 'utf8');
+const step42 = await readFile(new URL('../Send-MxP-Mutuals-assets/step-4.2.png', import.meta.url));
+const step43 = await readFile(new URL('../Send-MxP-Mutuals-assets/step-4.3.png', import.meta.url));
 const home = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 
 test('Send MxP Mutuals page is copied locally without an embedded frame', () => {
@@ -14,6 +16,10 @@ test('Send MxP Mutuals page is copied locally without an embedded frame', () => 
   assert.doesNotMatch(page, /data-arena|data-element-picker|designarena\.ai|cdn\.jsdelivr\.net/);
   assert.match(app, /Send-MxP-Mutuals-assets\/1788729491787_0nrhy6es0\.png/);
   assert.doesNotMatch(app, /supabase\.co\/storage\/v1\/object\/sign/);
+  assert.match(app, /screenshot:"Send-MxP-Mutuals-assets\/step-4\.2\.png"/);
+  assert.match(app, /screenshot2:"Send-MxP-Mutuals-assets\/step-4\.3\.png"/);
+  assert.ok(step42.length > 1000);
+  assert.ok(step43.length > 1000);
 });
 
 test('home page links to Send MxP Mutuals', () => {
