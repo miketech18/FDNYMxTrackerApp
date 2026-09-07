@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 const page = await readFile(new URL('../Send-MxP-Mutuals.html', import.meta.url), 'utf8');
 const app = await readFile(new URL('../Send-MxP-Mutuals-assets/index-DHbFsI3A.js', import.meta.url), 'utf8');
+const styles = await readFile(new URL('../Send-MxP-Mutuals-assets/index-B_kB5OCs.css', import.meta.url), 'utf8');
 const step42 = await readFile(new URL('../Send-MxP-Mutuals-assets/step-4.2.png', import.meta.url));
 const step43 = await readFile(new URL('../Send-MxP-Mutuals-assets/step-4.3.png', import.meta.url));
 const home = await readFile(new URL('../index.html', import.meta.url), 'utf8');
@@ -20,6 +21,12 @@ test('Send MxP Mutuals page is copied locally without an embedded frame', () => 
   assert.doesNotMatch(app, /supabase\.co\/storage\/v1\/object\/sign/);
   assert.match(app, /screenshot:"Send-MxP-Mutuals-assets\/step-4\.2\.png"/);
   assert.match(app, /screenshot2:"Send-MxP-Mutuals-assets\/step-4\.3\.png"/);
+  assert.match(app, /screenshot-scroll-multi/);
+  assert.match(styles, /\.screenshot-scroll-multi\{[^}]*overflow-x:auto/);
+  assert.match(styles, /\.screenshot-scroll-multi\{[^}]*min-width:0/);
+  assert.match(styles, /\.screenshot-scroll-multi\{[^}]*max-width:100%/);
+  assert.match(styles, /\.screenshot-scroll-multi\{[^}]*-webkit-overflow-scrolling:touch/);
+  assert.match(styles, /@media\(min-width:768px\)\{\.screenshot-scroll-multi\{[^}]*overflow-x:visible/);
   assert.ok(step42.length > 1000);
   assert.ok(step43.length > 1000);
 });
