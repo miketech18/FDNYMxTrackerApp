@@ -23,6 +23,9 @@ test('Send MxP Mutuals page is copied locally without an embedded frame', () => 
   assert.match(app, /screenshot2:"Send-MxP-Mutuals-assets\/step-4\.3\.png"/);
   assert.doesNotMatch(app, /Opposite Sets Required/);
   assert.doesNotMatch(app, /What.s the difference between MX On and MX Off\?/);
+  assert.match(app, /children:\["Send Mutual Sets to",Y\.jsx\("br"/);
+  assert.match(app, /className:"text-red not-italic"[^}]*children:"Your MX Partner"/);
+  assert.match(app, /Y\.jsx\("span",\{className:"text-brass"[^}]*children:"for Approval"/);
   assert.match(app, /screenshot-scroll-multi/);
   assert.match(app, /screenshot-shuffle/);
   assert.match(styles, /\.screenshot-scroll-multi\{[^}]*overflow-x:auto/);
