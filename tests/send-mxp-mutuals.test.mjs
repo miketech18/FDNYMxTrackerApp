@@ -22,11 +22,16 @@ test('Send MxP Mutuals page is copied locally without an embedded frame', () => 
   assert.match(app, /screenshot:"Send-MxP-Mutuals-assets\/step-4\.2\.png"/);
   assert.match(app, /screenshot2:"Send-MxP-Mutuals-assets\/step-4\.3\.png"/);
   assert.match(app, /screenshot-scroll-multi/);
+  assert.match(app, /screenshot-shuffle/);
   assert.match(styles, /\.screenshot-scroll-multi\{[^}]*overflow-x:auto/);
   assert.match(styles, /\.screenshot-scroll-multi\{[^}]*min-width:0/);
   assert.match(styles, /\.screenshot-scroll-multi\{[^}]*max-width:100%/);
   assert.match(styles, /\.screenshot-scroll-multi\{[^}]*-webkit-overflow-scrolling:touch/);
   assert.match(styles, /@media\(min-width:768px\)\{\.screenshot-scroll-multi\{[^}]*overflow-x:visible/);
+  assert.match(styles, /\.screenshot-shuffle\{[^}]*position:relative/);
+  assert.match(styles, /@keyframes screenshot-card-front/);
+  assert.match(styles, /@keyframes screenshot-card-back/);
+  assert.match(styles, /prefers-reduced-motion:reduce/);
   assert.ok(step42.length > 1000);
   assert.ok(step43.length > 1000);
 });
