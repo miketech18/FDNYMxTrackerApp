@@ -1,8 +1,41 @@
 import { useEffect, useRef, useState, type JSX } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Camera, Check, Clock3, FileSearch, Info, MessageSquare, ShieldAlert, X, ZoomIn } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Camera, Check, ChevronDown, Clock3, FileSearch, Info, MessageSquare, ShieldAlert, X, ZoomIn } from 'lucide-react'
 
 const checklistStorageKey = 'fdny-howto3-checks'
+const reportHours = 24
+
+const checklistItems = [
+  'The report date and reporting period are correct.',
+  'The scanned report hours match the printed sheet.',
+  'The calendar uses the same reporting period.',
+  'Missing or incorrect calendar entries are fixed.',
+  'Possible unpaid MSOT is checked against pay records.',
+  'The report and supporting pay records are saved.',
+]
+
+const faqs = [
+  {
+    question: 'What if the scanner reads the wrong total?',
+    answer: 'Rescan the entire page in even light or enter the printed total manually. Confirm the report date before using the projection.',
+  },
+  {
+    question: 'Why are my calendar hours higher?',
+    answer: 'The calendar may include MSOT that has not reached the report yet. Compare the same date range, then check those entries against your official pay records for possible unpaid MSOT.',
+  },
+  {
+    question: 'Why are my calendar hours lower?',
+    answer: 'A calendar mark may be missing or outside the selected date range. Use the report period to find and correct the entry.',
+  },
+  {
+    question: 'Does an hours match mean I was paid?',
+    answer: 'No. Matching totals only show that the calendar and report agree. Confirm payment separately on your official pay stub.',
+  },
+  {
+    question: 'Where is my checklist saved?',
+    answer: 'Checklist progress is stored only in this browser on this device. Clearing browser data may reset it.',
+  },
+]
 
 type Step = {
   id: 'newReport' | 'scanOptions' | 'projectedMsot' | 'calendarStats'
@@ -131,6 +164,49 @@ function ImageDialog({ image, onClose }: { image: { src: string; alt: string }; 
 
 export function OvertimeEqualizationGuide({ onFeedback }: { onFeedback: () => void }): JSX.Element {
   const [dialog, setDialog] = useState<{ src: string; alt: string } | null>(null)
+  const [calendarHours, setCalendarHours] = useState(reportHours)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [checklist, setChecklist] = useState<boolean[]>(() => {
+    try {
+      const saved: unknown = JSON.parse(localStorage.getItem(checklistStorageKey) ?? 'null')
+      if (Array.isArray(saved) && saved.length === 6 && saved.every(item => typeof item === 'boolean')) return saved
+    } catch { /* The checklist still works when storage is blocked or malformed. */ }
+    return [false, false, false, false, false, false]
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(checklistStorageKey, JSON.stringify(checklist))
+    } catch { /* Keep checklist interactions available when storage is blocked. */ }
+  }, [checklist])
+
+  const difference = calendarHours - reportHours
+  const comparison = difference > 0
+    ? {
+        tone: 'red',
+        label: 'CALENDAR HIGHER',
+        title: 'Possible unpaid MSOT to review.',
+        detail: `Your calendar has ${difference} more ${difference === 1 ? 'hour' : 'hours'} than the report. Check those MSOT entries against your official pay records.`,
+      }
+    : difference === 0
+      ? {
+          tone: 'green',
+          label: 'HOURS MATCH',
+          title: 'The two totals agree.',
+          detail: 'Matching hours does not confirm payment. Verify the overtime on your official pay stub.',
+        }
+      : {
+          tone: 'gold',
+          label: 'CALENDAR LOWER',
+          title: 'A calendar mark may be missing.',
+          detail: `Your calendar has ${Math.abs(difference)} fewer ${Math.abs(difference) === 1 ? 'hour' : 'hours'} than the report. Check the report period and add or correct the missing entry.`,
+        }
+  const completedCount = checklist.filter(Boolean).length
+  const checklistProgress = completedCount === 0 ? '0 of 6 done' : `${completedCount} of 6 done`
+
+  function toggleChecklistItem(index: number) {
+    setChecklist(current => current.map((done, itemIndex) => itemIndex === index ? !done : done))
+  }
 
   return <article className="msot-guide" data-checklist-key={checklistStorageKey}>
     <header className="msot-guide__hero">
@@ -191,6 +267,74 @@ export function OvertimeEqualizationGuide({ onFeedback }: { onFeedback: () => vo
             <span className="msot-guide__alert msot-guide__alert--red"><i />Calendar higher<strong>Check possible unpaid MSOT.</strong></span>
             <span className="msot-guide__alert msot-guide__alert--green"><i />Hours match<strong>Still confirm payment records.</strong></span>
             <span className="msot-guide__alert msot-guide__alert--gold"><i />Calendar lower<strong>Add or correct calendar entries.</strong></span>
+          </div>
+        </section>
+
+        <section className="msot-guide__simulator" aria-labelledby="msot-simulator-title">
+          <div className="msot-guide__section-heading">
+            <div><p>TRY THE COMPARISON</p><h2 id="msot-simulator-title">SEE WHAT EACH ALERT MEANS.</h2></div>
+            <span>REPORT HOURS <strong>{reportHours}</strong></span>
+          </div>
+          <div className="msot-guide__simulator-controls">
+            <div className="msot-guide__range-heading">
+              <label htmlFor="msot-calendar-hours">Calendar hours</label>
+              <output htmlFor="msot-calendar-hours">{calendarHours} hours</output>
+            </div>
+            <input
+              id="msot-calendar-hours"
+              type="range"
+              min="0"
+              max="36"
+              step="1"
+              value={calendarHours}
+              onChange={event => setCalendarHours(Number(event.target.value))}
+              aria-describedby="msot-simulator-status"
+            />
+            <div className="msot-guide__range-scale" aria-hidden="true"><span>0</span><span>24 report</span><span>36</span></div>
+          </div>
+          <div id="msot-simulator-status" className={`msot-simulator-status msot-simulator-status--${comparison.tone}`} aria-live="polite">
+            <span>{comparison.label}</span>
+            <div><strong>{comparison.title}</strong><p>{comparison.detail}</p></div>
+          </div>
+        </section>
+
+        <section className="msot-guide__checklist" aria-labelledby="msot-checklist-title">
+          <div className="msot-guide__section-heading">
+            <div><p>BEFORE YOU FINISH</p><h2 id="msot-checklist-title">RUN THE SIX-POINT CHECK.</h2></div>
+            <p className="msot-checklist-progress" aria-live="polite">{checklistProgress}</p>
+          </div>
+          <div className="msot-guide__checklist-grid">
+            {checklistItems.map((item, index) => <button
+              key={item}
+              type="button"
+              className={checklist[index] ? 'is-done' : ''}
+              aria-pressed={checklist[index]}
+              onClick={() => toggleChecklistItem(index)}
+            >
+              <span aria-hidden="true">{checklist[index] && <Check size={15} />}</span>
+              {item}
+            </button>)}
+          </div>
+          <small>Your progress is saved on this device.</small>
+        </section>
+
+        <section className="msot-guide__faq" aria-labelledby="msot-faq-title">
+          <div className="msot-guide__section-heading"><div><p>GOOD TO KNOW</p><h2 id="msot-faq-title">FIVE COMMON QUESTIONS.</h2></div></div>
+          <div className="msot-guide__faq-list">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaq === index
+              return <div className={isOpen ? 'is-open' : ''} key={faq.question}>
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={`msot-faq-answer-${index}`}
+                  onClick={() => setOpenFaq(isOpen ? null : index)}
+                >
+                  {faq.question}<ChevronDown size={18} />
+                </button>
+                {isOpen && <p id={`msot-faq-answer-${index}`}>{faq.answer}</p>}
+              </div>
+            })}
           </div>
         </section>
 

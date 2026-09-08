@@ -114,6 +114,17 @@ test('the overtime equalization guide explains the full scan workflow and expose
   assert.match(overtimeGuide, /aria-modal=["']true["']/)
 })
 
+test('the overtime equalization guide includes the simulator states and persisted checklist', async () => {
+  const overtimeGuide = await read('src/pages/OvertimeEqualizationGuide.tsx')
+
+  for (const expectedState of ['CALENDAR HIGHER', 'HOURS MATCH', 'CALENDAR LOWER']) {
+    assert.match(overtimeGuide, new RegExp(expectedState))
+  }
+  assert.match(overtimeGuide, /0 of 6 done/)
+  assert.match(overtimeGuide, /localStorage\.getItem/)
+  assert.match(overtimeGuide, /localStorage\.setItem/)
+})
+
 test('self-hosted WOFF2 fonts declare the correct format', async () => {
   const css = await read('src/index.css')
 
