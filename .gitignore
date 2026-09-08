@@ -5,6 +5,7 @@ artifacts/
 .DS_Store
 .vite-source-tags.js
 .vercel/
+.worktrees/
 .opencode/
 opencode.json
 old/experiments/
