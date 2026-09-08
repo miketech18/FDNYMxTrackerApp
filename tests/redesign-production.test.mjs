@@ -80,6 +80,24 @@ test('guide completion controls identify the step they affect', async () => {
   assert.match(guides, /mark-complete[^>]*aria-label=.*step\.title/)
 })
 
+test('the overtime equalization guide uses its dedicated route and source assets', async () => {
+  const [guides, overtimeGuide] = await Promise.all([
+    read('src/pages/Guides.tsx'),
+    read('src/pages/OvertimeEqualizationGuide.tsx'),
+  ])
+
+  assert.match(guides, /import\s+\{\s*OvertimeEqualizationGuide\s*\}\s+from\s+['"]\.\/OvertimeEqualizationGuide['"]/)
+  assert.match(guides, /guide\.slug\s*===\s*['"]overtime-equalization['"]/)
+  for (const stepId of ['newReport', 'scanOptions', 'projectedMsot', 'calendarStats']) {
+    assert.match(overtimeGuide, new RegExp(`id:\\s*['\"]${stepId}['\"]`))
+  }
+  assert.match(overtimeGuide, /Calendar hours/)
+  assert.match(overtimeGuide, /fdny-howto3-checks/)
+  for (const image of [1, 2, 3, 4]) {
+    assert.match(overtimeGuide, new RegExp(`/images/equalization-step-${image}\\.png`))
+  }
+})
+
 test('self-hosted WOFF2 fonts declare the correct format', async () => {
   const css = await read('src/index.css')
 
