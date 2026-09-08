@@ -29,6 +29,7 @@ try {
   check('No desktop horizontal overflow', await page.evaluate(() => document.documentElement.scrollWidth === window.innerWidth))
   check('Original fonts loaded', await page.evaluate(() => document.fonts.check('16px "Bebas Neue"') && document.fonts.check('16px "Inter"')))
   check('Hero screens load', await page.locator('.phone-frame img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)))
+  check('Feature cards render without the removed section intro', await page.locator('.features-section').evaluate(section => section.querySelector('.section-heading') === null && section.querySelectorAll('.feature-item').length === 4))
   await page.getByRole('button', { name: 'Next app screenshot' }).click()
   check('Carousel advances', await page.locator('.carousel-center p').textContent() === 'Your entire tour, at a glance')
   await page.getByRole('button', { name: 'Previous app screenshot' }).click()

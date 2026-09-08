@@ -132,9 +132,7 @@ h1, h2, h3, p { margin: 0; }
 .more-guides-note { color: #6f8092; font-size: 9px; display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 21px; }
 .more-guides-note svg { color: #948465; }
 .features-section { border-top: 1px solid var(--line); padding: 65px 0; }
-.features-section .section-heading h2 { font-size: 41px; }
-.section-description { color: var(--steel); font-size: 12px; line-height: 1.7; text-align: right; }
-.feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 34px; }
+.feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
 .feature-item { padding: 6px 28px 7px; border-left: 1px solid var(--line); }
 .feature-item:first-child { border: 0; padding-left: 0; }
 .feature-item:last-child { padding-right: 0; }
@@ -456,9 +454,6 @@ h1, h2, h3, p { margin: 0; }
   .guide-card-bottom small { display: inline; font-size: 9px; }
   .more-guides-note { font-size: 8px; gap: 6px; text-align: center; }
   .features-section { padding: 44px 0; }
-  .features-section .section-heading h2 { font-size: 35px; }
-  .section-description { text-align: left; font-size: 11px; }
-  .section-description br { display: none; }
   .feature-grid { row-gap: 27px; }
   .feature-item { padding-inline: 17px; }
   .feature-item h3 { font-size: 12px; line-height: 1.6; }
