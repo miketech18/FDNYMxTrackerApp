@@ -98,6 +98,22 @@ test('the overtime equalization guide uses its dedicated route and source assets
   }
 })
 
+test('the overtime equalization guide explains the full scan workflow and exposes an accessible image dialog', async () => {
+  const overtimeGuide = await read('src/pages/OvertimeEqualizationGuide.tsx')
+
+  for (const instruction of [
+    'SCAN YOUR OT SHEET',
+    'START A NEW REPORT SCAN',
+    'CAPTURE THE SHEET FLAT, LIT & FULL-PAGE',
+    'READ YOUR PROJECTED MSOT NUMBER',
+    'CLEAR THE CALENDAR ALERTS — 3 STATES',
+    'Matching hours does not confirm payment',
+  ]) {
+    assert.match(overtimeGuide, new RegExp(instruction.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  }
+  assert.match(overtimeGuide, /aria-modal=["']true["']/)
+})
+
 test('self-hosted WOFF2 fonts declare the correct format', async () => {
   const css = await read('src/index.css')
 

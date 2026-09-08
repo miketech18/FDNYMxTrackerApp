@@ -1,4 +1,4 @@
-import { CalendarDays, ArrowLeftRight } from 'lucide-react'
+import { CalendarDays, ArrowLeftRight, ScanLine } from 'lucide-react'
 
 export type GuideStep = { title: string; text: string; bullets?: string[]; image?: string; imageAlt?: string; note?: string }
 export const guides = [
@@ -36,5 +36,13 @@ export const guides = [
       { question: 'What if my partner rejects the mutual swap?', answer: 'The swap will appear in MX Partner History with a rejected status. You can update the tours on your calendar and send a new mutual set.' },
       { question: 'Can I edit tours after sending them?', answer: 'A submitted set cannot be edited directly. Ask your partner to reject the set, then correct your calendar entries and submit a new set.' },
     ],
+  },
+  {
+    slug: 'overtime-equalization', title: 'Scan and verify your MSOT', shortTitle: 'Scan & verify MSOT',
+    description: 'Scan your OT sheet, read the projection, and reconcile MSOT alerts.',
+    category: 'Overtime', time: '5 min read', icon: ScanLine, label: 'ONE REPORT. FOUR CHECKS.',
+    intro: 'Use the latest Overtime Equalization Report to check projected MSOT and compare report hours with your calendar.',
+    steps: [] as GuideStep[],
+    faqs: [],
   },
 ]
