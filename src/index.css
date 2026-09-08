@@ -677,7 +677,7 @@ h1, h2, h3, p { margin: 0; }
   .msot-guide__brief { display: none; }
   .msot-guide__actions { display: grid; grid-template-columns: 1fr 1fr; }
   .msot-guide__actions a { min-width: 0; font-size: 10px; }
-  .msot-guide__mobile-rail { position: sticky; z-index: 25; top: 76px; display: flex; overflow-x: auto; padding: 0 20px; border-bottom: 1px solid #d6a84b36; background: #0c131af5; scrollbar-width: none; }
+  .msot-guide__mobile-rail { position: sticky; z-index: 25; top: 93px; display: flex; overflow-x: auto; padding: 0 20px; border-bottom: 1px solid #d6a84b36; background: #0c131af5; scrollbar-width: none; }
   .msot-guide__mobile-rail a { flex: 0 0 auto; display: flex; align-items: center; gap: 7px; padding: 12px 15px 12px 0; color: #9da8b1; font-size: 9px; white-space: nowrap; }
   .msot-guide__mobile-rail span { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 22px; border-left: 3px solid var(--msot-red); color: var(--msot-brass); background: #c73a3212; font-family: 'Bebas Neue', sans-serif; font-size: 14px; }
   .msot-guide__layout { display: block; padding-top: 28px; padding-bottom: 45px; }
@@ -703,4 +703,8 @@ h1, h2, h3, p { margin: 0; }
   .msot-guide__footer-action button { margin-left: 39px; }
   .msot-guide__dialog-overlay { padding: 14px; }
   .msot-guide__dialog > button { top: 13px; right: 13px; }
+}
+
+@media (max-width: 700px) {
+  .msot-guide__mobile-rail { top: 76px; }
 }
