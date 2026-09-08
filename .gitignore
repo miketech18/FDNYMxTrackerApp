@@ -1,0 +1,11 @@
+node_modules/
+dist/
+artifacts/
+*.log
+.DS_Store
+.vite-source-tags.js
+.vercel/
+.opencode/
+opencode.json
+old/experiments/
+old/misc/

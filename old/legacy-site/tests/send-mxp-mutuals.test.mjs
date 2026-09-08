@@ -23,6 +23,8 @@ test('Send MxP Mutuals page is copied locally without an embedded frame', () => 
   assert.match(app, /screenshot2:"Send-MxP-Mutuals-assets\/step-4\.3\.png"/);
   assert.doesNotMatch(app, /Opposite Sets Required/);
   assert.doesNotMatch(app, /What.s the difference between MX On and MX Off\?/);
+  assert.match(app, /Tap their name in My Crew Roster and tap "MAKE MY MX PARTNER"  Once they accept you can both send sets to each other\./);
+  assert.doesNotMatch(app, /Go to My Crew → MX Partner tab\. If you don.t have a partner set/);
   assert.match(app, /children:\["Send Mutual Sets to",Y\.jsx\("br"/);
   assert.match(app, /className:"text-red not-italic"[^}]*children:"Your MX Partner"/);
   assert.match(app, /Y\.jsx\("span",\{className:"text-brass"[^}]*children:"for Approval"/);
@@ -43,4 +45,9 @@ test('Send MxP Mutuals page is copied locally without an embedded frame', () => 
 
 test('home page links to Send MxP Mutuals', () => {
   assert.match(home, /href="Send-MxP-Mutuals\.html"/);
+  assert.match(home, /class="nav-actions"/);
+  assert.match(home, /class="nav-action-group"/);
+  assert.match(home, /class="nav-feedback nav-feedback-primary"/);
+  assert.match(home, /\.nav-feedback-primary[^}]*margin-right:auto/);
+  assert.match(home, /\.nav-action-group[^}]*margin-left:auto/);
 });
