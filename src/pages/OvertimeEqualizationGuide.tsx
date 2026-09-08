@@ -6,7 +6,7 @@ const checklistStorageKey = 'fdny-howto3-checks'
 const reportHours = 24
 
 const checklistItems = [
-  'The report date and reporting period are correct.',
+  'Tapped “Scan New OT Report” for the current report date and reporting period.',
   'The scanned report hours match the printed sheet.',
   'The calendar uses the same reporting period.',
   'Missing or incorrect calendar entries are fixed.',
@@ -62,7 +62,7 @@ const steps: Step[] = [
       'Use the most recent printed report so the dates and totals line up with the period shown in the app.',
     ],
     image: '/images/equalization-step-2.png',
-    alt: 'Stats screen with the Scan New OT Report button highlighted',
+    alt: 'New report needed: Stats screen with the Scan New OT Report button highlighted',
     caption: 'Tracker → Stats → Scan New OT Report',
   },
   {
@@ -246,7 +246,7 @@ export function OvertimeEqualizationGuide({ onFeedback }: { onFeedback: () => vo
       </aside>
 
       <div className="msot-guide__content">
-        {steps.map(step => <section id={step.id} className={`msot-guide__step${step.format === 'wide' ? ' msot-guide__step--wide' : ''}`} key={step.id}>
+        {steps.map(step => <section id={step.id} className={`msot-guide__step msot-guide-step${step.format === 'wide' ? ' msot-guide__step--wide' : ''}`} key={step.id}>
           <div className="msot-guide__step-copy">
             <div className="msot-guide__step-heading"><span>{step.number}</span><p>STEP {Number(step.number)} OF {steps.length}</p></div>
             <h2>{step.title}</h2>
