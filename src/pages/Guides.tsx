@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Check, ChevronDown, Clock3, Info, MessageSquare, Search, X, ZoomIn } from 'lucide-react'
 import { guides } from '../lib/guides'
+import { OvertimeEqualizationGuide } from './OvertimeEqualizationGuide'
 
 export function Guides({ onFeedback }: { onFeedback: () => void }) {
   const [search, setSearch] = useState('')
@@ -38,6 +39,7 @@ export function GuidePage({ onFeedback }: { onFeedback: () => void }) {
       return Array.isArray(saved) ? [...new Set(saved.filter((item): item is number => typeof item === 'number' && Number.isInteger(item) && item >= 0 && item < (guide?.steps.length || 0)))] : []
     } catch { return [] }
   })
+  if (guide && guide.slug === 'overtime-equalization') return <OvertimeEqualizationGuide onFeedback={onFeedback} />
   if (!guide) return <NotFound />
   function toggleCompleted(index: number) {
     const updated = completed.includes(index) ? completed.filter(item => item !== index) : [...completed, index]
