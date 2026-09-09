@@ -107,8 +107,9 @@ const steps: Step[] = [
       'Gold — Check your calendar: the report has more hours than the calendar. Add or correct the missing MSOT entry for that period.',
     ],
     image: '/images/equalization-step-4.png',
-    alt: 'Overtime equalization projection and comparison screen',
+    alt: 'Three examples of calendar and overtime report comparison states',
     caption: 'Use the comparison result to check your calendar entries and pay records.',
+    format: 'wide',
   },
 ]
 
