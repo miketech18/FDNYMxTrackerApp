@@ -61,8 +61,8 @@ const steps: Step[] = [
       'Tap Scan New OT Report when the Stats screen says a new report is needed.',
       'Use the most recent printed report so the dates and totals line up with the period shown in the app.',
     ],
-    image: '/images/equalization-step-2.png',
-    alt: 'New report needed: Stats screen with the Scan New OT Report button highlighted',
+    image: '/images/equalization-step-1.png',
+    alt: 'Stats screen with the Scan New OT Report button highlighted',
     caption: 'Tracker → Stats → Scan New OT Report',
   },
   {
@@ -90,7 +90,7 @@ const steps: Step[] = [
       'Review how the app gets there: hours on paper now, banked hours not shown yet, scheduled hours ahead, and hours rolling off.',
       'If the scan read a number incorrectly, rescan the page or enter it manually before relying on the projection.',
     ],
-    image: '/images/equalization-step-4.png',
+    image: '/images/equalization-step-2.png',
     alt: 'Three examples of calendar and overtime report comparison states',
     caption: 'The comparison banner tells you what to check next.',
     format: 'wide',
@@ -106,9 +106,9 @@ const steps: Step[] = [
       'Green — MSOT hours match: the calendar and report totals agree for the period. Matching hours does not confirm payment.',
       'Gold — Check your calendar: the report has more hours than the calendar. Add or correct the missing MSOT entry for that period.',
     ],
-    image: '/images/equalization-step-1.png',
-    alt: 'Calendar alert showing report hours higher than calendar hours',
-    caption: 'Use the date range on the alert when checking calendar entries.',
+    image: '/images/equalization-step-4.png',
+    alt: 'Overtime equalization projection and comparison screen',
+    caption: 'Use the comparison result to check your calendar entries and pay records.',
   },
 ]
 

@@ -67,7 +67,7 @@ try {
   await page.goto(base + '/guides/overtime-equalization')
   check('MSOT guide has four steps', await page.locator('.msot-guide-step').count() === 4)
   check('MSOT guide marks the active step in both rails', await page.locator('.msot-guide__rail a[aria-current="step"]').count() === 1 && await page.locator('.msot-guide__mobile-rail a[aria-current="step"]').count() === 1)
-  await page.getByRole('button', { name: /Enlarge:.*New report needed/ }).click()
+  await page.getByRole('button', { name: /Enlarge:.*Scan New OT Report/ }).click()
   check('MSOT screenshot dialog opens', await page.getByRole('dialog').isVisible())
   await page.keyboard.press('Escape')
   check('MSOT screenshot dialog closes on Escape', await page.getByRole('dialog').count() === 0)
