@@ -165,6 +165,7 @@ function ImageDialog({ image, onClose }: { image: { src: string; alt: string }; 
 export function OvertimeEqualizationGuide({ onFeedback }: { onFeedback: () => void }): JSX.Element {
   const [dialog, setDialog] = useState<{ src: string; alt: string } | null>(null)
   const [calendarHours, setCalendarHours] = useState(reportHours)
+  const [activeStep, setActiveStep] = useState<Step['id']>(steps[0].id)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [checklist, setChecklist] = useState<boolean[]>(() => {
     try {
@@ -179,6 +180,20 @@ export function OvertimeEqualizationGuide({ onFeedback }: { onFeedback: () => vo
       localStorage.setItem(checklistStorageKey, JSON.stringify(checklist))
     } catch { /* Keep checklist interactions available when storage is blocked. */ }
   }, [checklist])
+
+  useEffect(() => {
+    const sections = steps.map(step => document.getElementById(step.id)).filter((section): section is HTMLElement => section !== null)
+    const observer = new IntersectionObserver(entries => {
+      const visibleSection = entries
+        .filter(entry => entry.isIntersecting)
+        .sort((first, second) => second.intersectionRatio - first.intersectionRatio)[0]
+
+      if (visibleSection) setActiveStep(visibleSection.target.id as Step['id'])
+    }, { rootMargin: '-20% 0px -60% 0px', threshold: [0, .1, .5] })
+
+    sections.forEach(section => observer.observe(section))
+    return () => observer.disconnect()
+  }, [])
 
   const difference = calendarHours - reportHours
   const comparison = difference > 0
@@ -203,6 +218,7 @@ export function OvertimeEqualizationGuide({ onFeedback }: { onFeedback: () => vo
         }
   const completedCount = checklist.filter(Boolean).length
   const checklistProgress = completedCount === 0 ? '0 of 6 done' : `${completedCount} of 6 done`
+  const calendarHoursText = `${calendarHours} calendar hours; ${comparison.label.toLowerCase()}`
 
   function toggleChecklistItem(index: number) {
     setChecklist(current => current.map((done, itemIndex) => itemIndex === index ? !done : done))
@@ -233,14 +249,14 @@ export function OvertimeEqualizationGuide({ onFeedback }: { onFeedback: () => vo
     </header>
 
     <nav className="msot-guide__mobile-rail" aria-label="Guide steps">
-      {steps.map(step => <a key={step.id} href={`#${step.id}`}><span>{step.number}</span>{step.railTitle}</a>)}
+      {steps.map(step => <a key={step.id} href={`#${step.id}`} className={activeStep === step.id ? 'is-active' : ''} aria-current={activeStep === step.id ? 'step' : undefined}><span>{step.number}</span>{step.railTitle}</a>)}
     </nav>
 
     <div className="container msot-guide__layout">
       <aside className="msot-guide__rail">
         <p>IN THIS GUIDE</p>
         <nav aria-label="Guide steps">
-          {steps.map(step => <a key={step.id} href={`#${step.id}`}><span>{step.number}</span><strong>{step.railTitle}</strong></a>)}
+          {steps.map(step => <a key={step.id} href={`#${step.id}`} className={activeStep === step.id ? 'is-active' : ''} aria-current={activeStep === step.id ? 'step' : undefined}><span>{step.number}</span><strong>{step.railTitle}</strong></a>)}
         </nav>
         <div className="msot-guide__rail-note"><ShieldAlert size={19} /><p>Use the app as a cross-check. Keep the official report and pay records as your source documents.</p></div>
       </aside>
@@ -289,6 +305,7 @@ export function OvertimeEqualizationGuide({ onFeedback }: { onFeedback: () => vo
               value={calendarHours}
               onChange={event => setCalendarHours(Number(event.target.value))}
               aria-describedby="msot-simulator-status"
+              aria-valuetext={calendarHoursText}
             />
             <div className="msot-guide__range-scale" aria-hidden="true"><span>0</span><span>24 report</span><span>36</span></div>
           </div>
