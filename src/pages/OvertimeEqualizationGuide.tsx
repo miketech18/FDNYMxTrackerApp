@@ -232,12 +232,8 @@ export function OvertimeEqualizationGuide({ onFeedback }: { onFeedback: () => vo
         <div className="msot-guide__hero-grid">
           <div>
             <p className="msot-guide__kicker"><span>HOW-TO 03</span><span>OVERTIME EQUALIZATION</span></p>
-            <h1>SCAN YOUR OT SHEET.<br /><span>VERIFY YOUR MSOT.</span></h1>
+            <h1>SCAN YOUR OT SHEET.<br /><span>Find a Missing OT Mark</span></h1>
             <p className="msot-guide__lede">Turn the latest printed Overtime Equalization Report into a useful projection, then reconcile the report against your calendar.</p>
-            <div className="msot-guide__actions">
-              <a href="#newReport">Start the four steps <ArrowRight size={16} /></a>
-              <a href="#scan-advice">Get a clean scan <Camera size={16} /></a>
-            </div>
           </div>
           <div className="msot-guide__brief" aria-label="Guide overview">
             <FileSearch size={27} />
