@@ -17,7 +17,7 @@ export function Header({ onFeedback }: { onFeedback: () => void }) {
   return <header className="site-header"><div className="container header-inner">
     <Link to="/" className="brand" aria-label="FDNY Mutual Tracker home"><img src="/images/app-icon.webp" alt="FDNY Mutual Tracker emblem" /><span className="brand-wordmark">FDNY <span>MUTUAL TRACKER</span><small>BUILT FOR THE FIREHOUSE.</small></span></Link>
     <nav className="header-actions" aria-label="Main navigation">
-      <span className="release-badge">v4.6.0</span>
+      <span className="release-badge">v4.7.24</span>
       <div className="guide-nav" ref={ref}>
         <button ref={trigger} className={`guide-nav-button ${open ? 'is-open' : ''}`} onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="guide-dropdown"><BookOpen size={17} /><span>How-to guides</span><ChevronDown size={15} className={open ? 'rotated' : ''} /></button>
         {open && <div className="guide-dropdown" id="guide-dropdown"><div className="dropdown-heading">A LITTLE HELP. A LOT MORE FROM YOUR APP.</div>{guides.map(guide => <Link key={guide.slug} to={`/guides/${guide.slug}`} onClick={() => setOpen(false)} className="dropdown-guide"><guide.icon size={21} /><span><strong>{guide.shortTitle}</strong><small>{guide.category} <span>·</span> {guide.time}</small></span><ArrowRight size={16} /></Link>)}<Link to="/guides" onClick={() => setOpen(false)} className="dropdown-all">Explore all how-to guides <ArrowRight size={16} /></Link><p>One home for every guide. More on the way.</p></div>}

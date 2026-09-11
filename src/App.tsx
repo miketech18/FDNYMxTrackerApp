@@ -26,6 +26,7 @@ function AppContent() {
           <Route path="/guides/:slug" element={<GuidePage key={location.pathname} onFeedback={() => setFeedback(true)} />} />
           <Route path="/how-to-share-calendar.html" element={<Navigate to="/guides/share-calendar" replace />} />
           <Route path="/Send-MxP-Mutuals.html" element={<Navigate to="/guides/send-mxp-mutuals" replace />} />
+          <Route path="/how-to-overtime-equalization.html" element={<Navigate to="/guides/overtime-equalization" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

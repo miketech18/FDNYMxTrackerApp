@@ -7,8 +7,10 @@ const routeFiles = [
   'guides/index.html',
   'guides/share-calendar/index.html',
   'guides/send-mxp-mutuals/index.html',
+  'guides/overtime-equalization/index.html',
   'how-to-share-calendar.html',
   'Send-MxP-Mutuals.html',
+  'how-to-overtime-equalization.html',
   '404.html',
 ]
 

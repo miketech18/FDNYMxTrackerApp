@@ -39,8 +39,10 @@ test('the deployment preserves the custom domain and supports direct routes', as
     'guides/index.html',
     'guides/share-calendar/index.html',
     'guides/send-mxp-mutuals/index.html',
+    'guides/overtime-equalization/index.html',
     'how-to-share-calendar.html',
     'Send-MxP-Mutuals.html',
+    'how-to-overtime-equalization.html',
     '404.html',
   ]) {
     assert.match(routeScript, new RegExp(route.replaceAll('.', '\\.'), 'i'))
@@ -53,8 +55,10 @@ test('the built Pages artifact contains every direct route and no preview instru
     'dist/guides/index.html',
     'dist/guides/share-calendar/index.html',
     'dist/guides/send-mxp-mutuals/index.html',
+    'dist/guides/overtime-equalization/index.html',
     'dist/how-to-share-calendar.html',
     'dist/Send-MxP-Mutuals.html',
+    'dist/how-to-overtime-equalization.html',
     'dist/404.html',
   ]
   const assetFiles = (await readdir(new URL('../dist/assets/', import.meta.url))).filter(file => file.endsWith('.js'))
@@ -130,4 +134,18 @@ test('self-hosted WOFF2 fonts declare the correct format', async () => {
 
   assert.doesNotMatch(css, /\.woff2'\) format\('truetype'\)/)
   assert.match(css, /\.woff2'\) format\('woff2'\)/)
+})
+
+test('all current website version labels identify release 4.7.24', async () => {
+  const currentWebsiteFiles = [
+    'src/pages/Home.tsx',
+    'src/components/Layout.tsx',
+    'old/legacy-site/index.html',
+  ]
+
+  for (const path of currentWebsiteFiles) {
+    const contents = await read(path)
+    assert.match(contents, /4\.7\.24/, `${path} must show version 4.7.24`)
+    assert.doesNotMatch(contents, /4\.6\.0/, `${path} must not show version 4.6.0`)
+  }
 })
