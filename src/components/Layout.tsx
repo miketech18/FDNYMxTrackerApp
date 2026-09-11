@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpen, ChevronDown, MessageSquare, ShieldCheck } from 'lucide-react'
+import { ArrowRight, BookOpen, ChevronDown, MessageSquare, ShieldCheck, X } from 'lucide-react'
 import { guides } from '../lib/guides'
 
 const IOS_URL = 'https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353'
@@ -16,9 +16,20 @@ function getStoreUrl(): string {
 
 export function AnnouncementBanner() {
   const [url, setUrl] = useState(IOS_URL)
+  const [dismissed, setDismissed] = useState(() => {
+    try { return localStorage.getItem('banner-dismissed') === '1' } catch { return false }
+  })
   useEffect(() => { setUrl(getStoreUrl()) }, [])
+  if (dismissed) return null
+  function dismiss(e: React.MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDismissed(true)
+    try { localStorage.setItem('banner-dismissed', '1') } catch { /* ok */ }
+  }
   return <a className="announcement-banner" href={url} target="_blank" rel="noreferrer">
     <div className="container"><p>New feature · 24hr full access no payment — no commitment · <strong>Try the best FDNY scheduling app now ↗</strong></p></div>
+    <button className="banner-dismiss" onClick={dismiss} aria-label="Dismiss banner"><X size={14} /></button>
   </a>
 }
 

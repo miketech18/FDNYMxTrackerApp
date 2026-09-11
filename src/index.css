@@ -29,9 +29,11 @@ h1, h2, h3, p { margin: 0; }
 .button-outline:hover { border-color: var(--brass); background: #d4a43d08; }
 .skip-link { position: fixed; top: -100px; left: 20px; z-index: 100; background: var(--cream); color: var(--night); padding: 12px 20px; border-radius: 4px; }
 .skip-link:focus { top: 12px; }
-.announcement-banner { display: block; background: var(--red); color: #fff; text-align: center; padding: 10px 16px; font-size: 12px; font-weight: 600; letter-spacing: .4px; transition: background .2s; cursor: pointer; }
+.announcement-banner { display: block; background: var(--red); color: #fff; text-align: center; padding: 10px 16px; font-size: 12px; font-weight: 600; letter-spacing: .4px; transition: background .2s; cursor: pointer; position: relative; }
 .announcement-banner:hover { background: #b80e22; }
 .announcement-banner strong { font-weight: 800; text-decoration: underline; text-underline-offset: 2px; }
+.banner-dismiss { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; padding: 4px; opacity: .6; transition: opacity .2s; display: flex; align-items: center; justify-content: center; }
+.banner-dismiss:hover { opacity: 1; }
 .site-header { height: 93px; position: sticky; top: 0; z-index: 40; background: #080c12f2; border-bottom: 1px solid #ffffff12; backdrop-filter: blur(16px); }
 .header-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .brand { display: flex; align-items: center; gap: 13px; flex-shrink: 0; }
