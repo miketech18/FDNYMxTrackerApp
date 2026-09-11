@@ -10,7 +10,7 @@ function AppContent() {
   const [feedback, setFeedback] = useState(() => window.location.hash === '#feedback-section')
   const location = useLocation()
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
     const guide = guides.find(item => location.pathname === `/guides/${item.slug}`)
     document.title = guide ? `${guide.title} · FDNY Mutual Tracker` : location.pathname.includes('guides') ? 'How-to Guides · FDNY Mutual Tracker' : 'FDNY Mutual Tracker · Built for our job'
   }, [location.pathname])
