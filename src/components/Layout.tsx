@@ -3,15 +3,21 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, BookOpen, ChevronDown, MessageSquare, ShieldCheck } from 'lucide-react'
 import { guides } from '../lib/guides'
 
+const IOS_URL = 'https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353'
+const ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.mauch.fdnyscheduler'
+
 function getStoreUrl(): string {
+  if (typeof navigator === 'undefined') return IOS_URL
   const ua = navigator.userAgent || ''
-  if (/android/i.test(ua)) return 'https://play.google.com/store/apps/details?id=com.mauch.fdnyscheduler'
-  if (/iPad|iPhone|iPod/.test(ua)) return 'https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353'
-  return 'https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353'
+  if (/android/i.test(ua)) return ANDROID_URL
+  if (/iPad|iPhone|iPod/.test(ua)) return IOS_URL
+  return IOS_URL
 }
 
 export function AnnouncementBanner() {
-  return <a className="announcement-banner" href={getStoreUrl()} target="_blank" rel="noreferrer">
+  const [url, setUrl] = useState(IOS_URL)
+  useEffect(() => { setUrl(getStoreUrl()) }, [])
+  return <a className="announcement-banner" href={url} target="_blank" rel="noreferrer">
     <div className="container"><p>New feature · 24hr full access no payment — no commitment · <strong>Try the best FDNY scheduling app now ↗</strong></p></div>
   </a>
 }
