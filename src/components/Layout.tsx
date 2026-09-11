@@ -3,10 +3,17 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, BookOpen, ChevronDown, MessageSquare, ShieldCheck } from 'lucide-react'
 import { guides } from '../lib/guides'
 
+function getStoreUrl(): string {
+  const ua = navigator.userAgent || ''
+  if (/android/i.test(ua)) return 'https://play.google.com/store/apps/details?id=com.mauch.fdnyscheduler'
+  if (/iPad|iPhone|iPod/.test(ua)) return 'https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353'
+  return 'https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353'
+}
+
 export function AnnouncementBanner() {
-  return <div className="announcement-banner" role="banner">
-    <div className="container"><p>New feature · 24hr full access no payment — no commitment · <strong>Try the best FDNY scheduling app now</strong></p></div>
-  </div>
+  return <a className="announcement-banner" href={getStoreUrl()} target="_blank" rel="noreferrer">
+    <div className="container"><p>New feature · 24hr full access no payment — no commitment · <strong>Try the best FDNY scheduling app now ↗</strong></p></div>
+  </a>
 }
 
 export function Header({ onFeedback }: { onFeedback: () => void }) {
