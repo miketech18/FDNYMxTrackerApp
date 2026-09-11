@@ -15,11 +15,10 @@ function getStoreUrl(): string {
 }
 
 export function AnnouncementBanner() {
-  const [url, setUrl] = useState(IOS_URL)
+  const [url] = useState(getStoreUrl)
   const [dismissed, setDismissed] = useState(() => {
     try { return localStorage.getItem('banner-dismissed') === '1' } catch { return false }
   })
-  useEffect(() => { setUrl(getStoreUrl()) }, [])
   if (dismissed) return null
   function openLink() { window.open(url, '_blank', 'noopener,noreferrer') }
   function dismiss(e: React.MouseEvent) {

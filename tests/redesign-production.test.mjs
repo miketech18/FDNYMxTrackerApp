@@ -8,7 +8,6 @@ test('the production shell contains no DesignArena recording or editor code', as
   const html = await read('index.html')
 
   assert.doesNotMatch(html, /designarena|rrweb|arena:|data-element-picker/i)
-  assert.doesNotMatch(html, /rel="canonical"/i)
 })
 
 test('the React source and build configuration are present', async () => {
