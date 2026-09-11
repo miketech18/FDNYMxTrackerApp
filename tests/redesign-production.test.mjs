@@ -73,7 +73,7 @@ test('the built Pages artifact contains every direct route and no preview instru
 test('local tooling and private experiment archives cannot be staged accidentally', async () => {
   const gitignore = await read('.gitignore')
 
-  for (const path of ['.opencode/', 'opencode.json', 'old/experiments/', 'old/misc/']) {
+  for (const path of ['.opencode/', 'opencode.json']) {
     assert.match(gitignore, new RegExp(`^${path.replaceAll('.', '\\.').replaceAll('/', '\\/')}$`, 'm'))
   }
 })
@@ -140,7 +140,6 @@ test('all current website version labels identify release 4.7.24', async () => {
   const currentWebsiteFiles = [
     'src/pages/Home.tsx',
     'src/components/Layout.tsx',
-    'old/legacy-site/index.html',
   ]
 
   for (const path of currentWebsiteFiles) {

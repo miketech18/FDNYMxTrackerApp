@@ -34,7 +34,7 @@ h1, h2, h3, p { margin: 0; }
 .site-header { height: 93px; position: sticky; top: 0; z-index: 40; background: #080c12f2; border-bottom: 1px solid #ffffff12; backdrop-filter: blur(16px); }
 .header-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .brand { display: flex; align-items: center; gap: 13px; flex-shrink: 0; }
-.brand > img { width: 57px; height: 57px; border-radius: 10px; }
+.brand > img { width: 72px; height: 72px; border-radius: 12px; }
 .brand-wordmark { font-family: 'Bebas Neue', sans-serif; font-size: 22px; line-height: 1.2; letter-spacing: .7px; }
 .brand-wordmark > span { color: #d9d9d6; }
 .brand-wordmark small { display: block; font-family: Inter, sans-serif; font-size: 8px; color: #8593a3; letter-spacing: 1.7px; font-weight: 500; margin-top: 5px; }
@@ -325,7 +325,7 @@ h1, h2, h3, p { margin: 0; }
 @media (max-width: 1150px) {
   .container { width: calc(100% - 72px); }
   .brand-wordmark { font-size: 20px; }
-  .brand > img { width: 50px; height: 50px; }
+  .brand > img { width: 62px; height: 62px; }
   .hero-grid { gap: 6px; min-height: 498px; padding-top: 30px; }
   .hero-copy h1 { font-size: 5.3vw; }
   .hero-eyebrow { font-size: 7px; letter-spacing: .85px; gap: 6px; }
@@ -403,7 +403,7 @@ h1, h2, h3, p { margin: 0; }
   body { padding-bottom: 82px; }
   .container { width: calc(100% - 40px); }
   .site-header { height: 76px; }
-  .brand > img { width: 43px; height: 43px; }
+  .brand > img { width: 54px; height: 54px; }
   .brand-wordmark { display: none; }
   .header-inner { gap: 12px; }
   .release-badge { display: none; }
