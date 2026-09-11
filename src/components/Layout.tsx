@@ -44,7 +44,7 @@ export function Header({ onFeedback }: { onFeedback: () => void }) {
     if (open) document.addEventListener('keydown', keyboard)
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', keyboard) }
   }, [open])
-  return <header className="site-header"><div className="container header-inner">
+  return <header className="site-header"><AnnouncementBanner /><div className="container header-inner">
     <Link to="/" className="brand" aria-label="FDNY Mutual Tracker home"><img src="/images/app-icon.webp" alt="FDNY Mutual Tracker emblem" /><span className="brand-wordmark">FDNY <span>MUTUAL TRACKER</span><small>BUILT FOR THE FIREHOUSE.</small></span></Link>
     <nav className="header-actions" aria-label="Main navigation">
       <span className="release-badge">v4.7.24</span>

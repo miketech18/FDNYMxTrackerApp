@@ -121,7 +121,7 @@ try {
   await mobile.waitForURL('**/guides')
   await mobile.locator('.library-card').first().waitFor()
   check('Mobile guide library loads all three guides', await mobile.locator('.library-card').count() === 3)
-  await mobile.locator('.nav-feedback').click()
+  await mobile.locator('.nav-feedback').first().click()
   check('Mobile feedback fits viewport', await mobile.getByRole('dialog').evaluate(el => el.getBoundingClientRect().width <= window.innerWidth))
   await mobile.screenshot({ path: 'artifacts/mobile-feedback.png' })
   const narrow = await browser.newPage({ viewport: { width: 320, height: 720 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true })
