@@ -20,7 +20,7 @@ export function AnnouncementBanner() {
     try { return localStorage.getItem('banner-dismissed') === '1' } catch { return false }
   })
   if (dismissed) return null
-  function openLink() { window.open(url, '_blank', 'noopener,noreferrer') }
+  function openLink() { window.open(url, '_blank', 'noopener,noreferrer'); window.umami?.track('click-banner') }
   function dismiss(e: React.MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
@@ -64,7 +64,7 @@ export function PlayIcon() {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#45a2fa" d="M3.6 1.8 13.9 12 3.6 22.2c-.37-.2-.6-.6-.6-1.1V2.9c0-.5.23-.9.6-1.1z" /><path fill="#35c576" d="M17.3 8.6 5.2 1.6c-.2-.12-.42-.18-.63-.19L13.9 12l3.4-3.4z" /><path fill="#ffce32" d="m17.3 15.4 3.2-1.85c1.2-.7 1.2-2.4 0-3.1L17.3 8.6 13.9 12z" /><path fill="#f35455" d="M4.57 22.6c.21-.01.43-.07.63-.19l12.1-7L13.9 12z" /></svg>
 }
 export function StoreButtons() {
-  return <div className="store-buttons"><a className="store-button" href="https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353" target="_blank" rel="noreferrer"><AppleIcon /><span><small>Download on the</small><strong>App Store</strong></span></a><a className="store-button" href="https://play.google.com/store/apps/details?id=com.mauch.fdnyscheduler" target="_blank" rel="noreferrer"><PlayIcon /><span><small>GET IT ON</small><strong>Google Play</strong></span></a></div>
+  return <div className="store-buttons"><a className="store-button" href="https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353" target="_blank" rel="noreferrer" data-umami-event="click-app-store"><AppleIcon /><span><small>Download on the</small><strong>App Store</strong></span></a><a className="store-button" href="https://play.google.com/store/apps/details?id=com.mauch.fdnyscheduler" target="_blank" rel="noreferrer" data-umami-event="click-google-play"><PlayIcon /><span><small>GET IT ON</small><strong>Google Play</strong></span></a></div>
 }
 export function DownloadBar() {
   return <aside className="download-bar" aria-label="Download the app"><div className="container download-inner"><div className="download-brand"><img src="/images/app-icon.webp" alt="" /><span><strong>Your next tour. All squared away.</strong><small>FDNY Mutual Tracker · iOS & Android</small></span></div><StoreButtons /></div></aside>
