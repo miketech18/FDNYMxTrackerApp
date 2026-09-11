@@ -20,7 +20,7 @@ function AppContent() {
       <a href="#main-content" className="skip-link">Skip to content</a>
       <AnnouncementBanner />
       <Header key={location.pathname} onFeedback={() => setFeedback(true)} />
-      <main id="main-content">
+      <main id="main-content" key={location.pathname} className="page-fade">
         <Routes>
           <Route path="/" element={<Home onFeedback={() => setFeedback(true)} />} />
           <Route path="/guides" element={<Guides onFeedback={() => setFeedback(true)} />} />
