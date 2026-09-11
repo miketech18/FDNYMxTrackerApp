@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, BookOpen, ChevronDown, MessageSquare, ShieldCheck } from 'lucide-react'
 import { guides } from '../lib/guides'
 
+export function AnnouncementBanner() {
+  return <div className="announcement-banner" role="banner">
+    <div className="container"><p>New feature · 24hr full access no payment — no commitment · <strong>Try the best FDNY scheduling app now</strong></p></div>
+  </div>
+}
+
 export function Header({ onFeedback }: { onFeedback: () => void }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)

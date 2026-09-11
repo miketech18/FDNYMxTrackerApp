@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import { Header, Footer, DownloadBar } from './components/Layout'
+import { AnnouncementBanner, Header, Footer, DownloadBar } from './components/Layout'
 import { FeedbackModal } from './components/FeedbackModal'
 import { Home } from './pages/Home'
 import { Guides, GuidePage, NotFound } from './pages/Guides'
@@ -18,6 +18,7 @@ function AppContent() {
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to content</a>
+      <AnnouncementBanner />
       <Header key={location.pathname} onFeedback={() => setFeedback(true)} />
       <main id="main-content">
         <Routes>
