@@ -21,16 +21,17 @@ export function AnnouncementBanner() {
   })
   useEffect(() => { setUrl(getStoreUrl()) }, [])
   if (dismissed) return null
+  function openLink() { window.open(url, '_blank', 'noopener,noreferrer') }
   function dismiss(e: React.MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
     setDismissed(true)
     try { localStorage.setItem('banner-dismissed', '1') } catch { /* ok */ }
   }
-  return <a className="announcement-banner" href={url} target="_blank" rel="noreferrer">
+  return <div className="announcement-banner" role="link" tabIndex={0} onClick={openLink} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') openLink() }}>
     <div className="container"><p>New feature · 24hr full access no payment — no commitment · <strong>Try the best FDNY scheduling app now ↗</strong></p></div>
     <button className="banner-dismiss" onClick={dismiss} aria-label="Dismiss banner"><X size={14} /></button>
-  </a>
+  </div>
 }
 
 export function Header({ onFeedback }: { onFeedback: () => void }) {
