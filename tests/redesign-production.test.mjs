@@ -147,3 +147,44 @@ test('all current website version labels identify release 4.7.24', async () => {
     assert.doesNotMatch(contents, /4\.6\.0/, `${path} must not show version 4.6.0`)
   }
 })
+
+test('simulator direct route is explicitly included in the Pages routeFiles list', async () => {
+  const script = await read('scripts/prepare-pages.mjs')
+  const routeList = script.match(/const routeFiles = \[([\s\S]*?)\]/)?.[1]
+  assert.ok(routeList, 'routeFiles must remain an explicit deployment list')
+  assert.match(routeList, /['"]app-simulator\/index\.html['"]/)
+})
+
+test('simulator uses isolated local state without backend or analytics calls', async () => {
+  const files = ['src/pages/AppSimulator.tsx', 'src/lib/simulator.ts']
+  for (const file of files) {
+    const source = await read(file)
+    assert.doesNotMatch(source, /\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon|firebase|umami|https?:\/\//i)
+  }
+  assert.match(await read('src/lib/simulator.ts'), /fdnymx\.demo\./)
+  assert.equal(await read('dist/app-simulator/index.html'), await read('dist/index.html'))
+})
+
+test('analytics excludes simulator direct loads and SPA events', async () => {
+  const { runInNewContext } = await import('node:vm')
+  const html = await read('index.html')
+  const script = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].find(match => match[1].includes('fdnyBeforeSend'))?.[1]
+  assert.ok(script, 'Expected the route-aware analytics bootstrap')
+  for (const pathname of ['/app-simulator', '/app-simulator/', '/APP-SIMULATOR', '/']) {
+    const scripts = []
+    const location = { pathname, origin: 'https://example.test' }
+    const context = { window: {}, location, URL, document: { createElement: () => ({ dataset: {} }), head: { appendChild: script => scripts.push(script) } } }
+    runInNewContext(script, context)
+    assert.equal(scripts.length, pathname === '/' ? 1 : 0)
+    if (pathname === '/') {
+      assert.equal(scripts[0].dataset.beforeSend, 'fdnyBeforeSend')
+      const payload = { url: '/guides', name: 'click' }
+      assert.equal(context.window.fdnyBeforeSend('event', payload), payload)
+      assert.equal(context.window.fdnyBeforeSend('event', { url: '/app-simulator' }), false)
+      location.pathname = '/app-simulator'
+      assert.equal(context.window.fdnyBeforeSend('event', payload), false, 'Navigation into the simulator blocks previously loaded analytics')
+    } else {
+      assert.equal(context.window.fdnyBeforeSend('event', { url: '/app-simulator', name: 'click' }), false)
+    }
+  }
+})

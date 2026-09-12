@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path'
 const outputDirectory = resolve('dist')
 const appShell = resolve(outputDirectory, 'index.html')
 const routeFiles = [
+  'app-simulator/index.html',
   'guides/index.html',
   'guides/share-calendar/index.html',
   'guides/send-mxp-mutuals/index.html',

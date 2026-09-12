@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { Header, Footer, DownloadBar } from './components/Layout'
 import { FeedbackModal } from './components/FeedbackModal'
+import { AppSimulator } from './pages/AppSimulator'
 import { Home } from './pages/Home'
 import { Guides, GuidePage, NotFound } from './pages/Guides'
 import { guides } from './lib/guides'
@@ -12,7 +13,7 @@ function AppContent() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
     const guide = guides.find(item => location.pathname === `/guides/${item.slug}`)
-    document.title = guide ? `${guide.title} · FDNY Mutual Tracker` : location.pathname.includes('guides') ? 'How-to Guides · FDNY Mutual Tracker' : 'FDNY Mutual Tracker · Built for our job'
+    document.title = location.pathname.replace(/\/$/, '') === '/app-simulator' ? 'App Simulator · FDNY Mutual Tracker' : guide ? `${guide.title} · FDNY Mutual Tracker` : location.pathname.includes('guides') ? 'How-to Guides · FDNY Mutual Tracker' : 'FDNY Mutual Tracker · Built for our job'
   }, [location.pathname])
 
   return (
@@ -22,6 +23,7 @@ function AppContent() {
       <main id="main-content" key={location.pathname} className="page-fade">
         <Routes>
           <Route path="/" element={<Home onFeedback={() => setFeedback(true)} />} />
+          <Route path="/app-simulator" element={<AppSimulator />} />
           <Route path="/guides" element={<Guides onFeedback={() => setFeedback(true)} />} />
           <Route path="/guides/:slug" element={<GuidePage key={location.pathname} onFeedback={() => setFeedback(true)} />} />
           <Route path="/how-to-share-calendar.html" element={<Navigate to="/guides/share-calendar" replace />} />
@@ -31,7 +33,7 @@ function AppContent() {
         </Routes>
       </main>
       <Footer onFeedback={() => setFeedback(true)} />
-      <DownloadBar />
+      {location.pathname.replace(/\/$/, '') !== '/app-simulator' && <DownloadBar />}
       {feedback && <FeedbackModal onClose={() => setFeedback(false)} context={location.pathname} />}
     </>
   )

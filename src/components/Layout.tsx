@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { ArrowRight, BookOpen, ChevronDown, MessageSquare, ShieldCheck, X } from 'lucide-react'
 import { guides } from '../lib/guides'
+
+declare global {
+  interface Window { umami?: { track: (event: string) => void } }
+}
 
 const IOS_URL = 'https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353'
 const ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.mauch.fdnyscheduler'
@@ -15,12 +19,13 @@ function getStoreUrl(): string {
 }
 
 export function AnnouncementBanner() {
+  const location = useLocation()
   const [url] = useState(getStoreUrl)
   const [dismissed, setDismissed] = useState(() => {
     try { return localStorage.getItem('banner-dismissed') === '1' } catch { return false }
   })
   if (dismissed) return null
-  function openLink() { window.open(url, '_blank', 'noopener,noreferrer'); window.umami?.track('click-banner') }
+  function openLink() { window.open(url, '_blank', 'noopener,noreferrer'); if (!/^\/app-simulator(?:\/|$)/i.test(location.pathname)) window.umami?.track('click-banner') }
   function dismiss(e: React.MouseEvent) {
     e.preventDefault()
     e.stopPropagation()

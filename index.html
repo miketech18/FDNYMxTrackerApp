@@ -26,7 +26,22 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="FDNY Tracker" />
-    <script defer src="https://cloud.umami.is/script.js" data-website-id="eba6bf30-a318-4f5a-a8d0-b81e2a5eecbd"></script>
+    <script>
+      // The public simulator must never send analytics, including SPA navigation.
+      window.fdnyBeforeSend = function (type, payload) {
+        const isDemo = path => /^\/app-simulator(?:\/|$)/i.test(path);
+        const payloadPath = new URL(payload.url || '/', location.origin).pathname;
+        return isDemo(location.pathname) || isDemo(payloadPath) ? false : payload;
+      };
+      if (!/^\/app-simulator(?:\/|$)/i.test(location.pathname)) {
+        const tracker = document.createElement('script');
+        tracker.defer = true;
+        tracker.src = 'https://cloud.umami.is/script.js';
+        tracker.dataset.websiteId = 'eba6bf30-a318-4f5a-a8d0-b81e2a5eecbd';
+        tracker.dataset.beforeSend = 'fdnyBeforeSend';
+        document.head.appendChild(tracker);
+      }
+    </script>
     <!-- Structured Data -->
     <script type="application/ld+json">{
       "@context": "https://schema.org",
