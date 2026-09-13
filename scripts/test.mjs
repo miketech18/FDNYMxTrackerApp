@@ -175,6 +175,9 @@ try {
   await page.waitForURL('**/app-simulator')
   await page.getByRole('heading', { name: 'Your next tour. Try it here.' }).waitFor()
   check('Simulator navigation from homepage works', await page.getByRole('heading', { name: 'Your next tour. Try it here.' }).isVisible())
+  for (let i = 0; i < 3; i++) { await page.goBack(); await page.waitForURL(u => !u.pathname.includes('app-simulator')); await simulatorLink.click(); await page.waitForURL('**/app-simulator') }
+  check('SPA navigation never duplicates the site header', await page.evaluate(() => document.querySelectorAll('header.site-header').length === 1))
+  check('SPA navigation never duplicates the announcement banner', await page.evaluate(() => document.querySelectorAll('.announcement-banner').length === 1))
   const demo = await browser.newPage({ viewport: { width: 1440, height: 1100 } })
   const externalRequests = []
   const backendRequests = []

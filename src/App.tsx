@@ -19,8 +19,8 @@ function AppContent() {
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to content</a>
-      <Header key={location.pathname} onFeedback={() => setFeedback(true)} />
-      <main id="main-content" key={location.pathname} className="page-fade">
+      <Header key={`header-${location.pathname}`} onFeedback={() => setFeedback(true)} />
+      <main id="main-content" key={`main-${location.pathname}`} className="page-fade">
         <Routes>
           <Route path="/" element={<Home onFeedback={() => setFeedback(true)} />} />
           <Route path="/app-simulator" element={<Suspense fallback={<p role="status" className="container">Loading app simulator…</p>}><AppSimulator /></Suspense>} />
