@@ -155,6 +155,20 @@ test('simulator direct route is explicitly included in the Pages routeFiles list
   assert.match(routeList, /['"]app-simulator\/index\.html['"]/)
 })
 
+test('simulator flags line-up days with the four mutual sets and an under-construction notice', async () => {
+  const page = await read('src/pages/AppSimulator.tsx')
+  const css = await read('src/pages/AppSimulator.css')
+  for (const label of ['First Set', 'Second Set', 'Insides', 'Outsides']) {
+    assert.match(page, new RegExp(`'${label}'`), `mutual pick card ${label} must be offered`)
+  }
+  assert.match(page, /Which set are you working\?/)
+  assert.match(page, /lineupTours/, 'line-up detection must drive the pick section')
+  assert.match(page, /sim-reference-mx-dot/, 'line-up days must carry a marker dot')
+  assert.match(css, /\.sim-reference-mx-dot[^}]*#e53935/, 'marker dot renders red')
+  assert.match(page, /Under construction/)
+  assert.match(css, /\.sim-construction/)
+})
+
 test('simulator uses isolated local state without backend or analytics calls', async () => {
   const files = ['src/pages/AppSimulator.tsx', 'src/lib/simulator.ts']
   for (const file of files) {

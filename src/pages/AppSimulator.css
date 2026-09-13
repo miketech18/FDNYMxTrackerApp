@@ -293,6 +293,18 @@
 .sim-reference-leave { position: absolute; bottom: 0; left: 2px; right: 2px; }
 .sim-reference-leave .sim-reference-entry { border-radius: 3px; }
 .sim-reference-crew-dot { position: absolute; bottom: 4px; left: calc(50% - 3px); width: 6px; height: 6px; border-radius: 50%; background: #ff8200; }
+.sim-reference-mx-dot { position: absolute; bottom: 4px; left: calc(50% + 5px); width: 6px; height: 6px; border-radius: 50%; background: #e53935; }
+.sim-construction { display: flex; align-items: center; justify-content: center; gap: 9px; background: repeating-linear-gradient(-45deg, #f2c53d 0 22px, #10171d 22px 44px); border-block: 1px solid #10171d; padding: 11px 16px; }
+.sim-construction p { margin: 0; background: #10171d; color: #f4f1ea; font: 600 12px/1.4 Inter, sans-serif; letter-spacing: .4px; padding: 6px 14px; border-radius: 999px; border: 1px solid #d4a43d55; }
+.sim-construction strong { color: #f2c53d; text-transform: uppercase; letter-spacing: 1.1px; }
+.sim-construction svg { color: #10171d; flex-shrink: 0; background: #f2c53d; border-radius: 50%; padding: 3px; }
+.sim-sheet-question { margin: 4px 0 8px; font: 700 13px/1.4 Inter, sans-serif; color: #f4f1ea; }
+.sim-pick-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-bottom: 10px; }
+.sim-pick-card { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 64px; background: #141418; border: 1px solid #ffffff1f; border-radius: 8px; padding: 12px 10px; text-align: center; }
+.sim-pick-card:hover { border-color: #d4a94e; background: #ffffff0a; }
+.sim-pick-card strong { font: 800 13px/1.2 Inter, sans-serif; color: #f4f1ea; }
+.sim-pick-card small { font: 500 10.5px/1.35 Inter, sans-serif; color: #8e8e99; }
+.sim-pick-num { position: absolute; top: 6px; left: 6px; width: 17px; height: 17px; display: grid; place-items: center; background: var(--red); color: #fff; font: 800 10px/1 Inter, sans-serif; border-radius: 5px; }
 .sim-reference-more { position: absolute; bottom: 2px; right: 2px; font: bold 8px Arial, sans-serif; background: #c4c4c4; }
 .sim-reference-blank { border-right: 1px solid #05080a; border-bottom: 1px solid #05080a; }
 .sim-reference-month-label { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #05080a; text-align: center; color: white; overflow: hidden; }

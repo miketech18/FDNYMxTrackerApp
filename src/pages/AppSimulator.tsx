@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, ArrowLeftRight, Bell, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardList, Clock3, Flame, Info, Plus, RotateCcw, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowLeftRight, Bell, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardList, Clock3, Flame, HardHat, Info, Plus, RotateCcw, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import { crew, defaultColors, DEMO_KEY, entryLabel, entryTypes, formatDate, hoursText, isOT, iso, loadDemo, onDate, seedDemo, shiftDate, sumHours, TODAY, type DemoState, type Entry, type EntryType } from '../lib/simulator'
 import './AppSimulator.css'
 
@@ -84,6 +84,7 @@ export function AppSimulator() {
     return <div className="sim-day-sheet">
       <p className="sim-sheet-label">TODAY'S ROSTER</p>
       <div className="sim-roster"><span className="sim-roster-tour">9x</span><span>(15) (16) 17* 18 19 20</span><span className="sim-roster-tour">6x</span><span>5* 6* 7* 8 9 10</span></div>
+      {mutualPickSection(day)}
       <p className="sim-sheet-label">ADD TO THIS DAY</p>
       <div className="sim-sheet-grid">
         {sheetBtn('MSOT', '● MSOT 9x', '9x', 9)}{sheetBtn('MSOT', '● MSOT 6x', '6x', 15)}
@@ -136,6 +137,35 @@ export function AppSimulator() {
     const cycle = ((Math.round((new Date(`${day}T12:00:00`).valueOf() - new Date('2026-09-04T12:00:00').valueOf()) / 86400000) % 8) + 8) % 8
     return { day: [0, 1].includes(cycle) ? 'blue' : [3, 4].includes(cycle) ? 'yellow' : '', night: [3, 4].includes(cycle) ? 'blue' : [6, 7].includes(cycle) ? 'yellow' : '' }
   }
+  // A line-up day: Johnny's group works one tour while Joe's group works the other — a mutual opportunity.
+  function lineupTours(day: string) { const tours = monthTours(day); return !!tours.day && !!tours.night && tours.day !== tours.night }
+  function lineupWindow(day: string): [string, string] | null {
+    if (!lineupTours(day)) return null
+    const start = lineupTours(shiftDate(day, 1)) ? day : lineupTours(shiftDate(day, -1)) ? shiftDate(day, -1) : day
+    return [start, shiftDate(start, 1)]
+  }
+  function applyMutualSet(name: string, tours: { date: string; tour: '9x' | '6x' }[]) {
+    setData(old => ({ ...old, entries: [...old.entries, ...tours.map((t): Entry => ({ id: crypto.randomUUID(), type: t.tour === '9x' ? 'MX On' : 'MX Off', date: t.date, end: t.date, tour: t.tour, hours: t.tour === '9x' ? 9 : 15, complete: false, training: 'CFR-D' }))] }))
+    setToast(`${name} logged with Joe Floorbelow. Demo only — nothing was sent.`)
+  }
+  function mutualPickSection(day: string) {
+    const pair = lineupWindow(day)
+    if (!pair) return null
+    const [first, second] = pair
+    const dow = (d: string) => formatDate(d, { weekday: 'long' })
+    const card = (num: string, name: string, sub: string, tours: { date: string; tour: '9x' | '6x' }[]) => <button className="sim-pick-card" onClick={() => applyMutualSet(name, tours)}><span className="sim-pick-num">{num}</span><strong>{name}</strong><small>{sub}</small></button>
+    return <>
+      <p className="sim-sheet-label">MUTUAL OPPORTUNITY</p>
+      <p className="sim-sheet-question">Which set are you working?</p>
+      <div className="sim-pick-grid">
+        {card('1', 'First Set', `${dow(first)} · 9x + 6x`, [{ date: first, tour: '9x' }, { date: first, tour: '6x' }])}
+        {card('2', 'Second Set', `${dow(second)} · 9x + 6x`, [{ date: second, tour: '9x' }, { date: second, tour: '6x' }])}
+        {card('3', 'Insides', `${dow(first)} 6x + ${dow(second)} 9x`, [{ date: first, tour: '6x' }, { date: second, tour: '9x' }])}
+        {card('4', 'Outsides', `${dow(first)} 9x + ${dow(second)} 6x`, [{ date: first, tour: '9x' }, { date: second, tour: '6x' }])}
+      </div>
+      <p className="sim-sheet-note">Both groups work this window — pick the 24-hour block you take with Joe. Demo only.</p>
+    </>
+  }
   function referenceMonth(monthDate: Date) {
     const y = monthDate.getFullYear(), m = monthDate.getMonth()
     const offset = new Date(y, m, 1, 12).getDay()
@@ -155,13 +185,14 @@ export function AppSimulator() {
         function band(e: Entry) {
           return <span key={e.id} className="sim-reference-entry" style={{ background: ['Awaiting Relief', 'Portal 2 Portal'].includes(e.type) ? '#FF8200' : color(e.type), color: ink(color(e.type)) }}>{entryLabel(e)}{e.complete && ' ✓'}</span>
         }
-        return <button key={day} className={`sim-reference-day ${day === TODAY ? 'is-today' : ''}`} aria-label={`${formatDate(day)}${holiday ? `, ${holiday}` : ''}${entries.length ? `, ${entries.length} entries` : ''}`} aria-pressed={day === date} onClick={() => { setDate(day); setModal({ kind: 'day', date: day }) }}>
+        return <button key={day} className={`sim-reference-day ${day === TODAY ? 'is-today' : ''}`} aria-label={`${formatDate(day)}${holiday ? `, ${holiday}` : ''}${lineupTours(day) ? ', mutual opportunity' : ''}${entries.length ? `, ${entries.length} entries` : ''}`} aria-pressed={day === date} onClick={() => { setDate(day); setModal({ kind: 'day', date: day }) }}>
           <span className="sim-reference-date">{i + 1}{payday && <b>$</b>}</span>
           <span className="sim-reference-day-tour">{dayEntries.length ? dayEntries.slice(0, 2).map(band) : tours.day && <span className={`sim-reference-tour ${tours.day}`}>9x{tours.day === 'yellow' && <small>⊘</small>}</span>}</span>
           {holiday && <span className="sim-reference-holiday">{holiday}</span>}
           <span className="sim-reference-night-tour">{nightEntries.length ? nightEntries.slice(0, 2).map(band) : tours.night && <span className={`sim-reference-tour ${tours.night}`}>6x{tours.night === 'yellow' && <small>⊘</small>}</span>}</span>
           <span className="sim-reference-leave">{leave.slice(0, 1).map(band)}</span>
           {entries.some(e => ['Crew On', 'Crew Off'].includes(e.type)) && <span className="sim-reference-crew-dot" />}
+          {lineupTours(day) && <span className="sim-reference-mx-dot" aria-hidden="true" />}
           {entries.length > 2 && <span className="sim-reference-more">+{entries.length - 2}</span>}
         </button>
       })}
@@ -238,6 +269,7 @@ export function AppSimulator() {
   const detail = modal?.kind === 'detail' ? data.entries.find(e => e.id === modal.id) : undefined
   const modalTitle = modal?.kind === 'day' ? formatDate(modal.date, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : modal?.kind === 'entry' ? 'Add demo entry' : modal?.kind === 'detail' ? detail?.type || 'Entry removed' : modal?.kind === 'reset' ? 'Reset this demo?' : modal?.kind === 'deletePartner' ? 'Remove Joe Floorbelow?' : modal?.kind === 'request' ? 'Mutual request' : modal?.kind === 'sync' ? 'Sync Warning' : modal?.kind === 'training' ? 'CHOOSE TRAINING' : modal?.kind === 'paywall' ? 'FDNY Mutual Tracker' : modal?.kind === 'info' ? modal.title : ''
   return <section className="app-simulator">
+    <div className="sim-construction" role="status"><HardHat size={16} /><p><strong>Under construction</strong> — new simulator screens are in the works. Every button stays demo-only.</p></div>
     <div className="container sim-intro"><Link className="sim-back-site" to="/"><ArrowLeft size={14} /> Back to the website</Link><div className="sim-intro-heading"><div><p className="eyebrow"><span className="status-dot" /> APP SIMULATOR — DEMO DATA</p><h1>Your next tour. Try it here.</h1><p>Your calendar, crew, and mutuals. Take a look around.</p></div><button className="button-outline" onClick={() => setModal({ kind: 'reset' })}><RotateCcw size={16} />Reset demo</button></div></div>
     <div className="container sim-workspace"><aside className="sim-side sim-side-left"><span className="sim-side-number">10–84</span><h2>All the moving parts.<br />One place.</h2><p>You’re Johnny Staylow for this tour. Your partner is Joe Floorbelow. Everything here is fictional.</p><div className="sim-tour-guide"><button onClick={() => { navigate('Calendar'); setView('WEEK') }}><CalendarDays size={18} /><span><strong>Check your tour</strong><small>Pick a day. Add a sample entry.</small></span><ArrowRight size={15} /></button><button onClick={() => { navigate('Tracker'); setTracker('MUTUALS') }}><ArrowLeftRight size={18} /><span><strong>Keep mutuals straight</strong><small>See who owes the next tour.</small></span><ArrowRight size={15} /></button><button onClick={() => { navigate('Tracker'); setTracker('STATS') }}><Clock3 size={18} /><span><strong>Account for every hour</strong><small>Try the OT report comparison.</small></span><ArrowRight size={15} /></button></div><p className="sim-side-foot"><ShieldCheck size={17} /> No sign-in. No real records.</p></aside>
     <div className={`sim-device ${tab === 'Calendar' && view === 'MONTH' ? 'sim-device-month' : ''}`}><div className="sim-device-status" aria-hidden="true"><span>9:41</span><i /><span>▮▮▮ ▰</span></div><header className="sim-app-header"><div>{subpage && <button className="sim-icon-button" aria-label="Back to section" onClick={() => showPage('')}><ArrowLeft size={18} /></button>}<h2 ref={heading} tabIndex={-1}>{subpage || tab}</h2><button className="sim-icon-button" aria-label="Demo recent activity" onClick={() => info('Recent activity', `${data.partner ? `Joe Floorbelow’s sample request is ${data.status.toLowerCase()}. ` : 'No active mutual requests. '}CFR-D training is due September 17. All activity is fictional.`)}><Bell size={19} /><span className="sim-notification-dot" /></button></div><p>L99 · GROUP 10 · DEMO</p></header>
