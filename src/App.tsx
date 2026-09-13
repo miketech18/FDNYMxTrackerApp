@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { Header, Footer, DownloadBar } from './components/Layout'
 import { FeedbackModal } from './components/FeedbackModal'
-import { AppSimulator } from './pages/AppSimulator'
+const AppSimulator = lazy(() => import('./pages/AppSimulator').then(module => ({ default: module.AppSimulator })))
 import { Home } from './pages/Home'
 import { Guides, GuidePage, NotFound } from './pages/Guides'
 import { guides } from './lib/guides'
@@ -23,7 +23,7 @@ function AppContent() {
       <main id="main-content" key={location.pathname} className="page-fade">
         <Routes>
           <Route path="/" element={<Home onFeedback={() => setFeedback(true)} />} />
-          <Route path="/app-simulator" element={<AppSimulator />} />
+          <Route path="/app-simulator" element={<Suspense fallback={<p role="status" className="container">Loading app simulator…</p>}><AppSimulator /></Suspense>} />
           <Route path="/guides" element={<Guides onFeedback={() => setFeedback(true)} />} />
           <Route path="/guides/:slug" element={<GuidePage key={location.pathname} onFeedback={() => setFeedback(true)} />} />
           <Route path="/how-to-share-calendar.html" element={<Navigate to="/guides/share-calendar" replace />} />

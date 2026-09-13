@@ -12,7 +12,7 @@ function Panel({ children, className = '' }: { children: ReactNode; className?: 
 function Empty({ title, children }: { title: string; children: ReactNode }) { return <Panel className="sim-empty"><CalendarDays size={24} /><h3>{title}</h3><p>{children}</p></Panel> }
 function Segments<T extends string>({ values, value, onChange, label }: { values: readonly T[]; value: T; onChange: (value: T) => void; label: string }) { return <div className="sim-segments" role="group" aria-label={label}>{values.map(item => <button key={item} aria-pressed={item === value} onClick={() => onChange(item)}>{item}</button>)}</div> }
 function Accordion({ title, meta, children, open = false }: { title: string; meta?: string; children: ReactNode; open?: boolean }) { return <details className="sim-accordion" open={open || undefined}><summary><span>{title}</span>{meta && <small>{meta}</small>}<ChevronRight size={15} /></summary><div className="sim-accordion-body">{children}</div></details> }
-function Dialog({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+function Dialog({ title, onClose, children, sheet = false }: { title: string; onClose: () => void; children: ReactNode; sheet?: boolean }) {
   const ref = useRef<HTMLDialogElement>(null)
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null
@@ -20,7 +20,7 @@ function Dialog({ title, onClose, children }: { title: string; onClose: () => vo
     dialog.showModal()
     return () => { dialog.close(); previous?.focus() }
   }, [])
-  return <dialog ref={ref} className="sim-dialog" aria-labelledby="sim-dialog-title" onCancel={e => { e.preventDefault(); onClose() }} onClick={e => { if (e.target === e.currentTarget) { const r = e.currentTarget.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose() } }}><div className="sim-dialog-heading"><div><span className="sim-kicker">FICTIONAL DATA · LOCAL DEMO</span><h2 id="sim-dialog-title">{title}</h2></div><button className="sim-icon-button" onClick={onClose} aria-label="Close dialog"><X size={20} /></button></div>{children}</dialog>
+  return <dialog ref={ref} className={`sim-dialog ${sheet ? 'sim-dialog-sheet' : ''}`} aria-labelledby="sim-dialog-title" onCancel={e => { e.preventDefault(); onClose() }} onClick={e => { if (e.target === e.currentTarget) { const r = e.currentTarget.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose() } }}><div className="sim-dialog-heading"><div><span className="sim-kicker">FICTIONAL DATA · LOCAL DEMO</span><h2 id="sim-dialog-title">{title}</h2></div><button className="sim-icon-button" onClick={onClose} aria-label="Close dialog"><X size={20} /></button></div>{children}</dialog>
 }
 function EntryForm({ initialType, date, save }: { initialType: EntryType; date: string; save: (entry: Entry) => void }) {
   const [type, setType] = useState<EntryType>(initialType)
@@ -40,6 +40,19 @@ export function AppSimulator() {
   const [tracker, setTracker] = useState('OT LOG')
   const [crewTab, setCrewTab] = useState('CREW')
   const [view, setView] = useState('WEEK')
+  const [fullscreen, setFullscreen] = useState(false)
+  const fullscreenButton = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (!fullscreen) return
+    const y = window.scrollY
+    const trigger = fullscreenButton.current
+    document.body.classList.add('sim-fullscreen-active')
+    return () => {
+      document.body.classList.remove('sim-fullscreen-active')
+      window.scrollTo({ top: y, behavior: 'instant' })
+      trigger?.focus({ preventScroll: true })
+    }
+  }, [fullscreen])
   const [largeMonthText, setLargeMonthText] = useState(false)
   const [date, setDate] = useState(TODAY)
   const [subpage, setSubpage] = useState('')
@@ -268,9 +281,10 @@ export function AppSimulator() {
   }
   const detail = modal?.kind === 'detail' ? data.entries.find(e => e.id === modal.id) : undefined
   const modalTitle = modal?.kind === 'day' ? formatDate(modal.date, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : modal?.kind === 'entry' ? 'Add demo entry' : modal?.kind === 'detail' ? detail?.type || 'Entry removed' : modal?.kind === 'reset' ? 'Reset this demo?' : modal?.kind === 'deletePartner' ? 'Remove Joe Floorbelow?' : modal?.kind === 'request' ? 'Mutual request' : modal?.kind === 'sync' ? 'Sync Warning' : modal?.kind === 'training' ? 'CHOOSE TRAINING' : modal?.kind === 'paywall' ? 'FDNY Mutual Tracker' : modal?.kind === 'info' ? modal.title : ''
-  return <section className="app-simulator">
+  return <section className={`app-simulator ${fullscreen ? 'sim-fullscreen' : ''}`}>
+    {fullscreen && <div className="sim-demo-toolbar"><span>DEMO · LOCAL DATA</span><button onClick={() => setModal({ kind: 'reset' })}><RotateCcw size={16} />Reset demo</button><button autoFocus onClick={() => setFullscreen(false)}><X size={18} />Exit full screen</button></div>}
     <div className="sim-construction" role="status"><HardHat size={16} /><p><strong>Under construction</strong> — new simulator screens are in the works. Every button stays demo-only.</p></div>
-    <div className="container sim-intro"><Link className="sim-back-site" to="/"><ArrowLeft size={14} /> Back to the website</Link><div className="sim-intro-heading"><div><p className="eyebrow"><span className="status-dot" /> APP SIMULATOR — DEMO DATA</p><h1>Your next tour. Try it here.</h1><p>Your calendar, crew, and mutuals. Take a look around.</p></div><button className="button-outline" onClick={() => setModal({ kind: 'reset' })}><RotateCcw size={16} />Reset demo</button></div></div>
+    <div className="container sim-intro"><Link className="sim-back-site" to="/"><ArrowLeft size={14} /> Back to the website</Link><div className="sim-intro-heading"><div><p className="eyebrow"><span className="status-dot" /> APP SIMULATOR — DEMO DATA</p><h1>Your next tour. Try it here.</h1><p>Your calendar, crew, and mutuals. Take a look around.</p></div><div className="sim-intro-actions"><button ref={fullscreenButton} className="button-primary" onClick={() => setFullscreen(true)}>Full-screen demo</button><button className="button-outline" onClick={() => setModal({ kind: 'reset' })}><RotateCcw size={16} />Reset demo</button></div></div></div>
     <div className="container sim-workspace"><aside className="sim-side sim-side-left"><span className="sim-side-number">10–84</span><h2>All the moving parts.<br />One place.</h2><p>You’re Johnny Staylow for this tour. Your partner is Joe Floorbelow. Everything here is fictional.</p><div className="sim-tour-guide"><button onClick={() => { navigate('Calendar'); setView('WEEK') }}><CalendarDays size={18} /><span><strong>Check your tour</strong><small>Pick a day. Add a sample entry.</small></span><ArrowRight size={15} /></button><button onClick={() => { navigate('Tracker'); setTracker('MUTUALS') }}><ArrowLeftRight size={18} /><span><strong>Keep mutuals straight</strong><small>See who owes the next tour.</small></span><ArrowRight size={15} /></button><button onClick={() => { navigate('Tracker'); setTracker('STATS') }}><Clock3 size={18} /><span><strong>Account for every hour</strong><small>Try the OT report comparison.</small></span><ArrowRight size={15} /></button></div><p className="sim-side-foot"><ShieldCheck size={17} /> No sign-in. No real records.</p></aside>
     <div className={`sim-device ${tab === 'Calendar' && view === 'MONTH' ? 'sim-device-month' : ''}`}><div className="sim-device-status" aria-hidden="true"><span>9:41</span><i /><span>▮▮▮ ▰</span></div><header className="sim-app-header"><div>{subpage && <button className="sim-icon-button" aria-label="Back to section" onClick={() => showPage('')}><ArrowLeft size={18} /></button>}<h2 ref={heading} tabIndex={-1}>{subpage || tab}</h2><button className="sim-icon-button" aria-label="Demo recent activity" onClick={() => info('Recent activity', `${data.partner ? `Joe Floorbelow’s sample request is ${data.status.toLowerCase()}. ` : 'No active mutual requests. '}CFR-D training is due September 17. All activity is fictional.`)}><Bell size={19} /><span className="sim-notification-dot" /></button></div><p>L99 · GROUP 10 · DEMO</p></header>
     <div className={`sim-screen ${tab === 'Calendar' && view === 'MONTH' ? 'sim-screen-month' : ''}`} ref={content}>{tab === 'Calendar' ? calendar() : tab === 'Tracker' ? trackerScreen() : tab === 'My Crew' ? crewScreen() : settingsScreen()}</div>
@@ -279,7 +293,7 @@ export function AppSimulator() {
     <div className="container sim-disclaimer"><ShieldCheck size={18} /><p>This interactive demo uses fictional data. Changes are local to this browser and do not affect the FDNY Mutual Tracker app.</p></div>
     {storageError && <p className="sim-storage-warning" role="alert">Browser storage is unavailable. You can still explore; changes will last only until you reload.</p>}
     <div className={`sim-toast ${toast ? 'is-visible' : ''}`} role="status" aria-live="polite">{toast && <><Check size={17} />{toast}</>}</div>
-    {modal && <Dialog key={modal.kind} title={modalTitle} onClose={() => setModal(null)}>
+    {modal && <Dialog key={modal.kind} sheet={modal.kind === 'day'} title={modalTitle} onClose={() => setModal(null)}>
       {modal.kind === 'day' && daySheet(modal.date)}
       {modal.kind === 'entry' && <EntryForm initialType={modal.type} date={date} save={addEntry} />}
       {modal.kind === 'detail' && detail && <><div className="sim-detail-summary">{chip(detail)}<h3>{detail.type === 'Training' ? detail.training : 'Johnny Staylow'}</h3><p>{formatDate(detail.date)}{detail.end !== detail.date && ` – ${formatDate(detail.end)}`} · {detail.tour} · {hoursText(detail.hours)}</p><p>{detail.vacation && `${detail.vacation} · `}{detail.complete ? 'Complete' : 'Scheduled'} · Fictional local entry</p></div><div className="sim-dialog-actions"><button className="sim-primary" onClick={() => { update({ entries: data.entries.map(e => e.id === detail.id ? { ...e, complete: !e.complete } : e) }); finish(detail.complete ? 'Demo entry marked scheduled.' : 'Demo entry marked complete.') }}>{detail.complete ? 'Mark scheduled' : 'Mark complete'}</button><button className="sim-danger" onClick={() => removeEntry(detail.id)}>Remove demo entry</button></div></>}

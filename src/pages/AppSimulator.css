@@ -335,3 +335,39 @@
 .sim-screen-month .sim-calendar-controls { display: block; position: sticky; top: 0; z-index: 5; background: #10171d; }
 .sim-screen-month .sim-reference-legend { position: sticky; top: 64px; z-index: 5; background: #10171d; min-height: 26px; }
 .sim-screen-month .sim-reference-weekdays { position: sticky; top: 90px; z-index: 5; background: #10171d; }
+
+/* The demo owns the viewport only after the visitor opens full screen. */
+.sim-intro-actions { display: flex; flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
+.sim-intro-actions button { min-height: 44px; }
+body.sim-fullscreen-active { overflow: hidden; }
+body.sim-fullscreen-active #root > :not(main) { display: none; }
+body.sim-fullscreen-active main { animation: none; }
+.app-simulator.sim-fullscreen { position: fixed; inset: 0; z-index: 100; height: 100dvh; padding: 0; display: flex; flex-direction: column; background: #0d0d0f; }
+.sim-fullscreen > .sim-intro, .sim-fullscreen > .sim-construction, .sim-fullscreen .sim-side, .sim-fullscreen > .sim-disclaimer { display: none; }
+.sim-demo-toolbar { display: flex; align-items: center; gap: 8px; padding: max(4px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 4px max(10px, env(safe-area-inset-left)); flex-shrink: 0; border-bottom: 1px solid #ffffff20; color: #d4a94e; }
+.sim-demo-toolbar > span { flex: 1; font: 700 10px/1.3 monospace; }
+.sim-demo-toolbar button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 44px; padding: 8px; border: 1px solid #ffffff20; border-radius: 6px; background: #1c1c22; color: #fff; font-size: 11px; }
+.sim-fullscreen .sim-workspace { display: flex; flex: 1; min-height: 0; width: 100%; max-width: 600px; padding: 0; border: 0; }
+.sim-fullscreen .sim-device { display: flex; flex-direction: column; height: 100%; border: 0; border-radius: 0; outline: 0; padding: 0; }
+.sim-fullscreen .sim-device-status, .sim-fullscreen .sim-home-indicator { display: none; }
+.sim-fullscreen .sim-app-header, .sim-fullscreen .sim-bottom-tabs { flex-shrink: 0; }
+.sim-fullscreen .sim-screen { flex: 1; min-height: 0; height: auto; }
+.sim-fullscreen .sim-screen-month { padding-top: 0; }
+.sim-fullscreen .sim-bottom-tabs { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+.sim-fullscreen .sim-toast { bottom: calc(85px + env(safe-area-inset-bottom)); pointer-events: none; }
+.sim-fullscreen .sim-storage-warning { margin: 0; padding: 5px 12px; flex-shrink: 0; }
+@media (max-width: 600px) {
+  .sim-intro-actions { margin-top: 16px; }
+  .sim-device .sim-icon-button, .sim-dialog .sim-icon-button, .sim-device .sim-today, .sim-device .sim-segments button, .sim-sheet-btn { min-height: 44px; }
+  .sim-device .sim-icon-button, .sim-screen-month .sim-date-nav .sim-icon-button { min-width: 44px; min-height: 44px; }
+  .sim-screen-month .sim-calendar-controls > .sim-date-nav { height: 52px; padding-block: 4px; }
+  .sim-screen-month .sim-calendar-controls > .sim-segments button { min-height: 44px; }
+  .sim-screen-month .sim-reference-legend { top: 96px; height: 54px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; gap: 5px; }
+  .sim-reference-legend > span, .sim-reference-legend > button { flex: 0 0 auto; font-size: 10px; padding: 6px; }
+  .sim-reference-legend > button { min-height: 44px; min-width: 44px; }
+  .sim-screen-month .sim-reference-weekdays { top: 150px; }
+  .sim-reference-date { font-size: 3.2cqw; }
+  .sim-dialog-sheet { position: fixed; inset: auto 0 0; margin: 0; width: 100%; max-width: none; max-height: 90dvh; border-radius: 20px 20px 0 0; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+  .sim-dialog-sheet::before { content: ''; display: block; width: 36px; height: 4px; background: #686873; border-radius: 4px; margin: -8px auto 16px; }
+  .sim-form input, .sim-form select { font-size: 16px; }
+}
