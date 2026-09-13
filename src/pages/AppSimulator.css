@@ -298,6 +298,9 @@
 .sim-construction p { margin: 0; background: #10171d; color: #f4f1ea; font: 600 12px/1.4 Inter, sans-serif; letter-spacing: .4px; padding: 6px 14px; border-radius: 999px; border: 1px solid #d4a43d55; }
 .sim-construction strong { color: #f2c53d; text-transform: uppercase; letter-spacing: 1.1px; }
 .sim-construction svg { color: #10171d; flex-shrink: 0; background: #f2c53d; border-radius: 50%; padding: 3px; }
+.sim-fireline { display: flex; justify-content: center; gap: 26px; overflow: hidden; white-space: nowrap; background: #ce1126; border-block: 1px solid #7f0a18; padding: 8px 0; }
+.sim-fireline span { display: flex; align-items: center; gap: 26px; color: #f4f1ea; font: 800 10px/1 Inter, sans-serif; letter-spacing: 2.4px; text-transform: uppercase; }
+.sim-fireline span::after { content: '✕'; font-size: 9px; opacity: .65; }
 .sim-sheet-question { margin: 4px 0 8px; font: 700 13px/1.4 Inter, sans-serif; color: #f4f1ea; }
 .sim-pick-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-bottom: 10px; }
 .sim-pick-card { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 64px; background: #141418; border: 1px solid #ffffff1f; border-radius: 8px; padding: 12px 10px; text-align: center; }
@@ -343,7 +346,7 @@ body.sim-fullscreen-active { overflow: hidden; }
 body.sim-fullscreen-active #root > :not(main) { display: none; }
 body.sim-fullscreen-active main { animation: none; }
 .app-simulator.sim-fullscreen { position: fixed; inset: 0; z-index: 100; height: 100dvh; padding: 0; display: flex; flex-direction: column; background: #0d0d0f; }
-.sim-fullscreen > .sim-intro, .sim-fullscreen > .sim-construction, .sim-fullscreen .sim-side, .sim-fullscreen > .sim-disclaimer { display: none; }
+.sim-fullscreen > .sim-intro, .sim-fullscreen > .sim-construction, .sim-fullscreen > .sim-fireline, .sim-fullscreen .sim-side, .sim-fullscreen > .sim-disclaimer { display: none; }
 .sim-demo-toolbar { display: flex; align-items: center; gap: 8px; padding: max(4px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 4px max(10px, env(safe-area-inset-left)); flex-shrink: 0; border-bottom: 1px solid #ffffff20; color: #d4a94e; }
 .sim-demo-toolbar > span { flex: 1; font: 700 10px/1.3 monospace; }
 .sim-demo-toolbar button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 44px; padding: 8px; border: 1px solid #ffffff20; border-radius: 6px; background: #1c1c22; color: #fff; font-size: 11px; }

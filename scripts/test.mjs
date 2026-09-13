@@ -133,6 +133,7 @@ try {
   sim.on('pageerror', error => failures.push(error.message))
   await sim.goto(base + '/app-simulator')
   await sim.locator('.sim-bottom-tabs').waitFor()
+  check('Fire line banner sits below the construction banner', await sim.evaluate(() => { const c = document.querySelector('.sim-construction')?.getBoundingClientRect(); const f = document.querySelector('.sim-fireline')?.getBoundingClientRect(); return !!c && !!f && f.top >= c.bottom - 1 && /fire line/i.test(document.querySelector('.sim-fireline')?.textContent || '') }))
   await sim.locator('.sim-bottom-tabs button', { hasText: 'Calendar' }).first().click()
   await sim.locator('.sim-segments button', { hasText: 'MONTH' }).first().click()
   await sim.locator('.sim-reference-day.is-today').click()
