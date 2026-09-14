@@ -135,7 +135,7 @@ test('self-hosted WOFF2 fonts declare the correct format', async () => {
   assert.match(css, /\.woff2'\) format\('woff2'\)/)
 })
 
-test('all current website version labels identify release 4.7.24', async () => {
+test('all current website version labels identify release 4.8.0', async () => {
   const currentWebsiteFiles = [
     'src/pages/Home.tsx',
     'src/components/Layout.tsx',
@@ -143,7 +143,7 @@ test('all current website version labels identify release 4.7.24', async () => {
 
   for (const path of currentWebsiteFiles) {
     const contents = await read(path)
-    assert.match(contents, /4\.7\.24/, `${path} must show version 4.7.24`)
+    assert.match(contents, /4\.8\.0/, `${path} must show version 4.8.0`)
     assert.doesNotMatch(contents, /4\.6\.0/, `${path} must not show version 4.6.0`)
   }
 })

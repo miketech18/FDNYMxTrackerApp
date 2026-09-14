@@ -300,9 +300,9 @@ export function AppSimulator() {
       <Accordion title="02 OPERATIONAL TOOLS">{row('Open operational tools', () => showPage('Operational Tools'), 'Door codes, navigation, links & numbers')}</Accordion>
       <Accordion title="03 APPEARANCE" meta="CUSTOM">{row('Edit Colors', () => showPage('Edit Colors'), 'Tour colors & presets')}</Accordion>
       <Accordion title="04 DATA & MAINTENANCE" meta={data.backedUp ? 'DEMO SNAPSHOT' : 'NOT BACKED UP'}>{row('Backup now', () => { update({ backedUp: true }); setToast('Demo backup preview complete. No data left this browser.') }, 'Simulated backup only')}{['Import data', 'Calendar sync', 'Transfer data'].map(name => <div key={name}>{row(name, () => info(`${name} · demo`, 'This preview does not import, export, or sync records. Reset demo restores the fictional sample.'))}</div>)}</Accordion>
-      <Accordion title="05 ABOUT & SUPPORT" meta="v4.7.24"><Panel><h3>FDNY MUTUAL TRACKER</h3><p>Version 4.7.24 · Interactive demo</p><small>Not affiliated with the FDNY or City of New York.</small></Panel>{row('View subscription preview', () => setModal({ kind: 'paywall' }))}</Accordion>
+      <Accordion title="05 ABOUT & SUPPORT" meta="v4.8.0"><Panel><h3>FDNY MUTUAL TRACKER</h3><p>Version 4.8.0 · Interactive demo</p><small>Not affiliated with the FDNY or City of New York.</small></Panel>{row('View subscription preview', () => setModal({ kind: 'paywall' }))}</Accordion>
       <Accordion title="06 SEND FEEDBACK & SHARE">{row('Feedback preview', () => info('Feedback · demo', 'No message will be sent from this simulator. Use the website’s Send feedback button outside the phone if you want to contact the developer.'))}{row('Share preview', () => info('Share the demo', 'Visitors can explore this same fictional app at /app-simulator. Browser-local changes are never shared.'))}</Accordion>
-      <img className="sim-watermark" src="/images/app-icon.webp" alt="" /><p className="sim-version">FDNY MUTUAL TRACKER · v4.7.24</p>
+      <img className="sim-watermark" src="/images/app-icon.webp" alt="" /><p className="sim-version">FDNY MUTUAL TRACKER · v4.8.0</p>
     </>
   }
   const detail = modal?.kind === 'detail' ? data.entries.find(e => e.id === modal.id) : undefined
