@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { ArrowRight, BookOpen, ChevronDown, MessageSquare, ShieldCheck, X } from 'lucide-react'
 import { guides } from '../lib/guides'
 
@@ -19,13 +19,12 @@ function getStoreUrl(): string {
 }
 
 export function AnnouncementBanner() {
-  const location = useLocation()
   const [url] = useState(getStoreUrl)
   const [dismissed, setDismissed] = useState(() => {
     try { return localStorage.getItem('banner-dismissed') === '1' } catch { return false }
   })
   if (dismissed) return null
-  function openLink() { window.open(url, '_blank', 'noopener,noreferrer'); if (!/^\/app-simulator(?:\/|$)/i.test(location.pathname)) window.umami?.track('click-banner') }
+  function openLink() { window.open(url, '_blank', 'noopener,noreferrer'); window.umami?.track('click-banner') }
   function dismiss(e: React.MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
@@ -38,7 +37,7 @@ export function AnnouncementBanner() {
   </div>
 }
 
-export function Header({ onFeedback }: { onFeedback: () => void }) {
+export function Header({ onFeedback, showAnnouncement = true }: { onFeedback: () => void; showAnnouncement?: boolean }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
@@ -49,7 +48,7 @@ export function Header({ onFeedback }: { onFeedback: () => void }) {
     if (open) document.addEventListener('keydown', keyboard)
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', keyboard) }
   }, [open])
-  return <header className="site-header"><AnnouncementBanner /><div className="container header-inner">
+  return <header className="site-header">{showAnnouncement && <AnnouncementBanner />}<div className="container header-inner">
     <Link to="/" className="brand" aria-label="FDNY Mutual Tracker home"><img src="/images/app-icon.webp" alt="FDNY Mutual Tracker emblem" /><span className="brand-wordmark">FDNY <span>MUTUAL TRACKER</span><small>BUILT FOR THE FIREHOUSE.</small></span></Link>
     <nav className="header-actions" aria-label="Main navigation">
       <span className="release-badge">v4.7.24</span>

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, ArrowLeftRight, Bell, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardList, Clock3, Flame, HardHat, Info, Plus, RotateCcw, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ArrowLeftRight, Bell, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardList, Clock3, Flame, Info, Plus, RotateCcw, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import { crew, defaultColors, DEMO_KEY, entryLabel, entryTypes, formatDate, hoursText, isOT, iso, loadDemo, onDate, seedDemo, shiftDate, sumHours, TODAY, type DemoState, type Entry, type EntryType } from '../lib/simulator'
 import './AppSimulator.css'
 
@@ -62,6 +62,32 @@ export function AppSimulator() {
   const [query, setQuery] = useState('')
   const content = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement>(null)
+  const deviceShell = useRef<HTMLDivElement>(null)
+  const [deviceScale, setDeviceScale] = useState(1)
+  const [deviceHeight, setDeviceHeight] = useState(0)
+  useLayoutEffect(() => {
+    const shell = deviceShell.current
+    const device = shell?.querySelector<HTMLElement>('.sim-device')
+    if (!shell || !device) return
+    let frame = 0
+    const measure = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        const rawWidth = device.offsetWidth
+        const rawHeight = device.offsetHeight
+        const availableWidth = shell.clientWidth
+        const availableHeight = window.innerHeight - shell.getBoundingClientRect().top - 12
+        const nextScale = fullscreen ? 1 : Math.max(.5, Math.min(1, availableWidth / rawWidth, availableHeight / rawHeight))
+        setDeviceHeight(rawHeight)
+        setDeviceScale(previous => Math.abs(previous - nextScale) > .01 ? nextScale : previous)
+      })
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(device)
+    window.addEventListener('resize', measure)
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener('resize', measure) }
+  }, [fullscreen])
   function setData(action: DemoState | ((old: DemoState) => DemoState)) {
     const next = typeof action === 'function' ? action(data) : action
     try { localStorage.setItem(DEMO_KEY, JSON.stringify(next)); setStorageError(false) } catch { setStorageError(true) }
@@ -283,13 +309,11 @@ export function AppSimulator() {
   const modalTitle = modal?.kind === 'day' ? formatDate(modal.date, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) : modal?.kind === 'entry' ? 'Add demo entry' : modal?.kind === 'detail' ? detail?.type || 'Entry removed' : modal?.kind === 'reset' ? 'Reset this demo?' : modal?.kind === 'deletePartner' ? 'Remove Joe Floorbelow?' : modal?.kind === 'request' ? 'Mutual request' : modal?.kind === 'sync' ? 'Sync Warning' : modal?.kind === 'training' ? 'CHOOSE TRAINING' : modal?.kind === 'paywall' ? 'FDNY Mutual Tracker' : modal?.kind === 'info' ? modal.title : ''
   return <section className={`app-simulator ${fullscreen ? 'sim-fullscreen' : ''}`}>
     {fullscreen && <div className="sim-demo-toolbar"><span>DEMO · LOCAL DATA</span><button onClick={() => setModal({ kind: 'reset' })}><RotateCcw size={16} />Reset demo</button><button autoFocus onClick={() => setFullscreen(false)}><X size={18} />Exit full screen</button></div>}
-    <div className="sim-construction" role="status"><HardHat size={16} /><p><strong>Under construction</strong> — new simulator screens are in the works. Every button stays demo-only.</p></div>
-    <div className="sim-fireline" aria-hidden="true">{Array.from({ length: 8 }, (_, i) => <span key={i}>Fire line — do not cross</span>)}</div>
     <div className="container sim-intro"><Link className="sim-back-site" to="/"><ArrowLeft size={14} /> Back to the website</Link><div className="sim-intro-heading"><div><p className="eyebrow"><span className="status-dot" /> APP SIMULATOR — DEMO DATA</p><h1>Your next tour. Try it here.</h1><p>Your calendar, crew, and mutuals. Take a look around.</p></div><div className="sim-intro-actions"><button ref={fullscreenButton} className="button-primary" onClick={() => setFullscreen(true)}>Full-screen demo</button><button className="button-outline" onClick={() => setModal({ kind: 'reset' })}><RotateCcw size={16} />Reset demo</button></div></div></div>
     <div className="container sim-workspace"><aside className="sim-side sim-side-left"><span className="sim-side-number">10–84</span><h2>All the moving parts.<br />One place.</h2><p>You’re Johnny Staylow for this tour. Your partner is Joe Floorbelow. Everything here is fictional.</p><div className="sim-tour-guide"><button onClick={() => { navigate('Calendar'); setView('WEEK') }}><CalendarDays size={18} /><span><strong>Check your tour</strong><small>Pick a day. Add a sample entry.</small></span><ArrowRight size={15} /></button><button onClick={() => { navigate('Tracker'); setTracker('MUTUALS') }}><ArrowLeftRight size={18} /><span><strong>Keep mutuals straight</strong><small>See who owes the next tour.</small></span><ArrowRight size={15} /></button><button onClick={() => { navigate('Tracker'); setTracker('STATS') }}><Clock3 size={18} /><span><strong>Account for every hour</strong><small>Try the OT report comparison.</small></span><ArrowRight size={15} /></button></div><p className="sim-side-foot"><ShieldCheck size={17} /> No sign-in. No real records.</p></aside>
-    <div className={`sim-device ${tab === 'Calendar' && view === 'MONTH' ? 'sim-device-month' : ''}`}><div className="sim-device-status" aria-hidden="true"><span>9:41</span><i /><span>▮▮▮ ▰</span></div><header className="sim-app-header"><div>{subpage && <button className="sim-icon-button" aria-label="Back to section" onClick={() => showPage('')}><ArrowLeft size={18} /></button>}<h2 ref={heading} tabIndex={-1}>{subpage || tab}</h2><button className="sim-icon-button" aria-label="Demo recent activity" onClick={() => info('Recent activity', `${data.partner ? `Joe Floorbelow’s sample request is ${data.status.toLowerCase()}. ` : 'No active mutual requests. '}CFR-D training is due September 17. All activity is fictional.`)}><Bell size={19} /><span className="sim-notification-dot" /></button></div><p>L99 · GROUP 10 · DEMO</p></header>
+    <div ref={deviceShell} className="sim-device-shell" style={{ height: deviceScale < 1 && deviceHeight ? deviceHeight * deviceScale : undefined }}><div className={`sim-device ${tab === 'Calendar' && view === 'MONTH' ? 'sim-device-month' : ''}`} style={{ transform: deviceScale < 1 ? `scale(${deviceScale})` : undefined }}><div className="sim-device-status" aria-hidden="true"><span>9:41</span><i /><span>▮▮▮ ▰</span></div><header className="sim-app-header"><div>{subpage && <button className="sim-icon-button" aria-label="Back to section" onClick={() => showPage('')}><ArrowLeft size={18} /></button>}<h2 ref={heading} tabIndex={-1}>{subpage || tab}</h2><button className="sim-icon-button" aria-label="Demo recent activity" onClick={() => info('Recent activity', `${data.partner ? `Joe Floorbelow’s sample request is ${data.status.toLowerCase()}. ` : 'No active mutual requests. '}CFR-D training is due September 17. All activity is fictional.`)}><Bell size={19} /><span className="sim-notification-dot" /></button></div><p>L99 · GROUP 10 · DEMO</p></header>
     <div className={`sim-screen ${tab === 'Calendar' && view === 'MONTH' ? 'sim-screen-month' : ''}`} ref={content}>{tab === 'Calendar' ? calendar() : tab === 'Tracker' ? trackerScreen() : tab === 'My Crew' ? crewScreen() : settingsScreen()}</div>
-    <nav className="sim-bottom-tabs" aria-label="Simulator app navigation">{tabs.map(item => <button key={item.name} aria-pressed={tab === item.name} onClick={() => navigate(item.name)}><item.icon size={21} /><i /><span>{item.name}</span></button>)}</nav><div className="sim-home-indicator" aria-hidden="true" /></div>
+    <nav className="sim-bottom-tabs" aria-label="Simulator app navigation">{tabs.map(item => <button key={item.name} aria-pressed={tab === item.name} onClick={() => navigate(item.name)}><item.icon size={21} /><i /><span>{item.name}</span></button>)}</nav><div className="sim-home-indicator" aria-hidden="true" /></div></div>
     <aside className="sim-side sim-side-right"><span className="sim-kicker">TODAY’S DEMO</span><div className="sim-side-tour"><span className="sim-date-large">12</span><span>SEP<br />2026</span></div><h3>Night tour, squared away.</h3><p>Explore a sample week, jump through the year, or get into the details.</p><div className="sim-side-note"><Info size={17} /><p>Every button in the phone is part of the demo. Reset anytime to start fresh.</p></div><Link className="text-link" to="/guides">Need a field guide? <ArrowRight size={15} /></Link></aside></div>
     <div className="container sim-disclaimer"><ShieldCheck size={18} /><p>This interactive demo uses fictional data. Changes are local to this browser and do not affect the FDNY Mutual Tracker app.</p></div>
     {storageError && <p className="sim-storage-warning" role="alert">Browser storage is unavailable. You can still explore; changes will last only until you reload.</p>}

@@ -16,10 +16,12 @@ function AppContent() {
     document.title = location.pathname.replace(/\/$/, '') === '/app-simulator' ? 'App Simulator · FDNY Mutual Tracker' : guide ? `${guide.title} · FDNY Mutual Tracker` : location.pathname.includes('guides') ? 'How-to Guides · FDNY Mutual Tracker' : 'FDNY Mutual Tracker · Built for our job'
   }, [location.pathname])
 
+  const isSimulator = /^\/app-simulator(?:\/|$)/i.test(location.pathname)
+
   return (
     <>
       <a href="#main-content" className="skip-link">Skip to content</a>
-      <Header key={`header-${location.pathname}`} onFeedback={() => setFeedback(true)} />
+      {!isSimulator && <Header key={`header-${location.pathname}`} onFeedback={() => setFeedback(true)} />}
       <main id="main-content" key={`main-${location.pathname}`} className="page-fade">
         <Routes>
           <Route path="/" element={<Home onFeedback={() => setFeedback(true)} />} />

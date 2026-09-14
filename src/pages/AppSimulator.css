@@ -25,7 +25,8 @@
 .sim-side-note { display: flex; gap: 12px; border-block: 1px solid var(--line); padding-block: 22px; margin-block: 26px; font-size: 11px; }
 .sim-side-note > svg { flex-shrink: 0; margin-top: 3px; color: var(--brass); }
 .sim-side-right { max-width: 235px; }
-.sim-device { min-width: 0; width: 100%; background: var(--sim-bg); border: 6px solid #333a42; outline: 1px solid #64717e; border-radius: 44px; padding: 0 5px; color: #f5f5f5; box-shadow: 0 35px 90px #0009, inset 0 0 0 1px #000; overflow: hidden; }
+.sim-device-shell { min-width: 0; width: 100%; display: flex; justify-content: center; align-items: flex-start; }
+.sim-device { min-width: 0; width: 100%; background: var(--sim-bg); border: 6px solid #333a42; outline: 1px solid #64717e; border-radius: 44px; padding: 0 5px; color: #f5f5f5; box-shadow: 0 35px 90px #0009, inset 0 0 0 1px #000; overflow: hidden; transform-origin: top center; }
 .sim-device-status { height: 37px; padding: 0 23px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 600; }
 .sim-device-status i { background: #000; height: 22px; width: 100px; border-radius: 20px; }
 .sim-app-header { padding: 12px 16px 17px; border-bottom: 1px solid var(--sim-border); }
@@ -240,6 +241,7 @@
   .sim-intro h1 { font-size: 36px; }
   .sim-intro-heading > button { margin-top: 15px; min-height: 40px; padding: 10px 14px; font-size: 11px; }
   .sim-workspace { width: 100%; max-width: none; padding: 0; }
+  .sim-device-shell { align-items: flex-start; }
   .sim-device { border: 0; outline: 0; border-radius: 0; padding: 0; box-shadow: none; }
   .sim-device-status, .sim-home-indicator { display: none; }
   .sim-app-header { padding: 20px 16px 15px; }
@@ -294,13 +296,6 @@
 .sim-reference-leave .sim-reference-entry { border-radius: 3px; }
 .sim-reference-crew-dot { position: absolute; bottom: 4px; left: calc(50% - 3px); width: 6px; height: 6px; border-radius: 50%; background: #ff8200; }
 .sim-reference-mx-dot { position: absolute; bottom: 4px; left: calc(50% + 5px); width: 6px; height: 6px; border-radius: 50%; background: #e53935; }
-.sim-construction { display: flex; align-items: center; justify-content: center; gap: 9px; background: repeating-linear-gradient(-45deg, #f2c53d 0 22px, #10171d 22px 44px); border-block: 1px solid #10171d; padding: 11px 16px; }
-.sim-construction p { margin: 0; background: #10171d; color: #f4f1ea; font: 600 12px/1.4 Inter, sans-serif; letter-spacing: .4px; padding: 6px 14px; border-radius: 999px; border: 1px solid #d4a43d55; }
-.sim-construction strong { color: #f2c53d; text-transform: uppercase; letter-spacing: 1.1px; }
-.sim-construction svg { color: #10171d; flex-shrink: 0; background: #f2c53d; border-radius: 50%; padding: 3px; }
-.sim-fireline { display: flex; justify-content: center; gap: 26px; overflow: hidden; white-space: nowrap; background: #ce1126; border-block: 1px solid #7f0a18; padding: 8px 0; }
-.sim-fireline span { display: flex; align-items: center; gap: 26px; color: #f4f1ea; font: 800 10px/1 Inter, sans-serif; letter-spacing: 2.4px; text-transform: uppercase; }
-.sim-fireline span::after { content: '✕'; font-size: 9px; opacity: .65; }
 .sim-sheet-question { margin: 4px 0 8px; font: 700 13px/1.4 Inter, sans-serif; color: #f4f1ea; }
 .sim-pick-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-bottom: 10px; }
 .sim-pick-card { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 64px; background: #141418; border: 1px solid #ffffff1f; border-radius: 8px; padding: 12px 10px; text-align: center; }
@@ -346,12 +341,13 @@ body.sim-fullscreen-active { overflow: hidden; }
 body.sim-fullscreen-active #root > :not(main) { display: none; }
 body.sim-fullscreen-active main { animation: none; }
 .app-simulator.sim-fullscreen { position: fixed; inset: 0; z-index: 100; height: 100dvh; padding: 0; display: flex; flex-direction: column; background: #0d0d0f; }
-.sim-fullscreen > .sim-intro, .sim-fullscreen > .sim-construction, .sim-fullscreen > .sim-fireline, .sim-fullscreen .sim-side, .sim-fullscreen > .sim-disclaimer { display: none; }
+.sim-fullscreen > .sim-intro, .sim-fullscreen .sim-side, .sim-fullscreen > .sim-disclaimer { display: none; }
 .sim-demo-toolbar { display: flex; align-items: center; gap: 8px; padding: max(4px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 4px max(10px, env(safe-area-inset-left)); flex-shrink: 0; border-bottom: 1px solid #ffffff20; color: #d4a94e; }
 .sim-demo-toolbar > span { flex: 1; font: 700 10px/1.3 monospace; }
 .sim-demo-toolbar button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 44px; padding: 8px; border: 1px solid #ffffff20; border-radius: 6px; background: #1c1c22; color: #fff; font-size: 11px; }
-.sim-fullscreen .sim-workspace { display: flex; flex: 1; min-height: 0; width: 100%; max-width: 600px; padding: 0; border: 0; }
-.sim-fullscreen .sim-device { display: flex; flex-direction: column; height: 100%; border: 0; border-radius: 0; outline: 0; padding: 0; }
+.sim-fullscreen .sim-workspace { display: flex; flex: 1; align-items: stretch; min-height: 0; width: 100%; max-width: 600px; padding: 0; border: 0; }
+.sim-fullscreen .sim-device-shell { display: flex; flex: 1; align-items: stretch; min-height: 0; height: auto !important; overflow: hidden; }
+.sim-fullscreen .sim-device { display: flex; flex-direction: column; width: 100%; min-height: 0; height: 100%; transform: none !important; }
 .sim-fullscreen .sim-device-status, .sim-fullscreen .sim-home-indicator { display: none; }
 .sim-fullscreen .sim-app-header, .sim-fullscreen .sim-bottom-tabs { flex-shrink: 0; }
 .sim-fullscreen .sim-screen { flex: 1; min-height: 0; height: auto; }

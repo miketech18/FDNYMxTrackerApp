@@ -133,7 +133,22 @@ try {
   sim.on('pageerror', error => failures.push(error.message))
   await sim.goto(base + '/app-simulator')
   await sim.locator('.sim-bottom-tabs').waitFor()
-  check('Fire line banner sits below the construction banner', await sim.evaluate(() => { const c = document.querySelector('.sim-construction')?.getBoundingClientRect(); const f = document.querySelector('.sim-fireline')?.getBoundingClientRect(); return !!c && !!f && f.top >= c.bottom - 1 && /fire line/i.test(document.querySelector('.sim-fireline')?.textContent || '') }))
+  check('Simulator starts without auxiliary banners', await sim.locator('.sim-construction, .sim-fireline').count() === 0)
+  const fit = await browser.newPage({ viewport: { width: 1440, height: 1100 }, deviceScaleFactor: 1 })
+  for (const [width, height] of [[1440, 1100], [1280, 800], [768, 900], [390, 844], [320, 720]]) {
+    await fit.setViewportSize({ width, height })
+    await fit.goto(base + '/app-simulator')
+    await fit.locator('.sim-device').waitFor()
+    await fit.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
+    const fitMetrics = await fit.evaluate(() => {
+      const shell = document.querySelector('.sim-device-shell')?.getBoundingClientRect()
+      const device = document.querySelector('.sim-device')?.getBoundingClientRect()
+      return { shell, device, documentWidth: document.documentElement.scrollWidth }
+    })
+    check(`Simulator fits without clipping at ${width}x${height}`, !!fitMetrics.shell && !!fitMetrics.device && fitMetrics.device.top >= -1 && fitMetrics.device.bottom <= height + 1 && fitMetrics.shell.bottom <= height + 1)
+    check(`Simulator has no overflow at ${width}x${height}`, fitMetrics.documentWidth === width)
+  }
+  await fit.close()
   await sim.locator('.sim-bottom-tabs button', { hasText: 'Calendar' }).first().click()
   await sim.locator('.sim-segments button', { hasText: 'MONTH' }).first().click()
   await sim.locator('.sim-reference-day.is-today').click()
@@ -176,8 +191,9 @@ try {
   await page.getByRole('heading', { name: 'Your next tour. Try it here.' }).waitFor()
   check('Simulator navigation from homepage works', await page.getByRole('heading', { name: 'Your next tour. Try it here.' }).isVisible())
   for (let i = 0; i < 3; i++) { await page.goBack(); await page.waitForURL(u => !u.pathname.includes('app-simulator')); await simulatorLink.click(); await page.waitForURL('**/app-simulator') }
-  check('SPA navigation never duplicates the site header', await page.evaluate(() => document.querySelectorAll('header.site-header').length === 1))
-  check('SPA navigation never duplicates the announcement banner', await page.evaluate(() => document.querySelectorAll('.announcement-banner').length === 1))
+  await page.locator('header.site-header').waitFor({ state: 'detached' })
+  check('SPA navigation hides the shared site header on the simulator', await page.locator('header.site-header').count() === 0)
+  check('SPA navigation hides the announcement banner on the simulator', await page.locator('.announcement-banner').count() === 0)
   const demo = await browser.newPage({ viewport: { width: 1440, height: 1100 } })
   const externalRequests = []
   const backendRequests = []
@@ -298,6 +314,7 @@ try {
   check('Simulator has no desktop overflow', await demo.evaluate(() => document.documentElement.scrollWidth === innerWidth))
   for (const width of [320, 390]) {
     await demo.setViewportSize({ width, height: 844 })
+    await demo.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await demo.getByRole('button', { name: 'Full-screen demo', exact: true }).click()
     check(`Full screen fills the ${width}px viewport`, await demo.locator('.sim-fullscreen').evaluate(el => Math.abs(el.getBoundingClientRect().height - innerHeight) < 1))
     for (const tab of ['Calendar', 'Tracker', 'My Crew', 'Settings']) {
@@ -323,6 +340,7 @@ try {
     await demo.getByRole('button', { name: 'Keep exploring' }).click()
     await demo.getByRole('button', { name: 'Exit full screen' }).click()
     check('Exit restores the website and launch button focus', await demo.getByRole('button', { name: 'Full-screen demo', exact: true }).evaluate(el => el === document.activeElement && !document.body.classList.contains('sim-fullscreen-active')))
+    await demo.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await demo.getByRole('button', { name: 'WEEK', exact: true }).click()
     await demo.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     await demo.screenshot({ path: `artifacts/simulator-${width}.png`, fullPage: true })
