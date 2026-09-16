@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, ArrowLeftRight, Bell, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardList, Clock3, Flame, Info, Plus, RotateCcw, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import { crew, defaultColors, DEMO_KEY, entryLabel, entryTypes, formatDate, hoursText, isOT, iso, loadDemo, onDate, seedDemo, shiftDate, sumHours, TODAY, type DemoState, type Entry, type EntryType } from '../lib/simulator'
@@ -65,6 +65,9 @@ export function AppSimulator() {
   const deviceShell = useRef<HTMLDivElement>(null)
   const [deviceScale, setDeviceScale] = useState(1)
   const [deviceHeight, setDeviceHeight] = useState(0)
+  const monthLongPressTimer = useRef<number | null>(null)
+  const monthLongPressTriggered = useRef(false)
+  const monthLongPressStart = useRef<{ x: number; y: number } | null>(null)
   useLayoutEffect(() => {
     const shell = deviceShell.current
     const device = shell?.querySelector<HTMLElement>('.sim-device')
@@ -164,6 +167,46 @@ export function AppSimulator() {
       return <button className={`${date === day ? 'is-selected' : ''} ${day === TODAY ? 'is-today' : ''}`} key={day} aria-label={`${formatDate(day)}${holiday ? `, ${holiday}` : ''}${entries.length ? `, ${entries.length} entries` : ''}`} aria-pressed={date === day} onClick={() => { setDate(day); if (mini) setView('MONTH') }}><span className="sim-day-number">{i + 1}{payday && <small>$</small>}</span><span className="sim-tour-ticks"><i style={{ background: color('9x') }}>9x</i><i style={{ background: color('6x') }}>6x</i></span>{!mini && holiday && <span className="sim-holiday">{holiday}</span>}{entries.slice(0, mini ? 1 : 2).map(e => <span key={e.id}>{chip(e, true)}</span>)}{entries.length > (mini ? 1 : 2) && <small>+{entries.length - (mini ? 1 : 2)}</small>}</button>
     })}</div></div>
   }
+  function clearMonthLongPress() {
+    if (monthLongPressTimer.current !== null) {
+      window.clearTimeout(monthLongPressTimer.current)
+      monthLongPressTimer.current = null
+    }
+    monthLongPressStart.current = null
+  }
+  function monthLongPressStartHandler(day: string, event: PointerEvent<HTMLButtonElement>) {
+    clearMonthLongPress()
+    monthLongPressTriggered.current = false
+    monthLongPressStart.current = { x: event.clientX, y: event.clientY }
+    monthLongPressTimer.current = window.setTimeout(() => {
+      monthLongPressTriggered.current = true
+      setDate(day)
+      setView('WEEK')
+      setModal(null)
+      monthLongPressTimer.current = null
+    }, 550)
+  }
+  function monthLongPressMoveHandler(event: PointerEvent<HTMLButtonElement>) {
+    const start = monthLongPressStart.current
+    if (!start || Math.hypot(event.clientX - start.x, event.clientY - start.y) <= 10) return
+    clearMonthLongPress()
+  }
+  function monthLongPressEndHandler() {
+    clearMonthLongPress()
+    if (monthLongPressTriggered.current) {
+      // Suppress the synthetic click produced after a completed long press, but
+      // do not let that suppression affect the next unrelated control click.
+      window.setTimeout(() => { monthLongPressTriggered.current = false }, 0)
+    }
+  }
+  function monthDayClick(day: string) {
+    if (monthLongPressTriggered.current) {
+      monthLongPressTriggered.current = false
+      return
+    }
+    setDate(day)
+    setModal({ kind: 'day', date: day })
+  }
   function monthTours(day: string) {
     // Fictional tour pattern matching the reference calendar's two group bands.
     const dayNumber = Number(day.slice(-2))
@@ -224,7 +267,7 @@ export function AppSimulator() {
         function band(e: Entry) {
           return <span key={e.id} className="sim-reference-entry" style={{ background: ['Awaiting Relief', 'Portal 2 Portal'].includes(e.type) ? '#FF8200' : color(e.type), color: ink(color(e.type)) }}>{entryLabel(e)}{e.complete && ' ✓'}</span>
         }
-        return <button key={day} className={`sim-reference-day ${day === TODAY ? 'is-today' : ''}`} aria-label={`${formatDate(day)}${holiday ? `, ${holiday}` : ''}${lineupTours(day) ? ', mutual opportunity' : ''}${entries.length ? `, ${entries.length} entries` : ''}`} aria-pressed={day === date} onClick={() => { setDate(day); setModal({ kind: 'day', date: day }) }}>
+        return <button key={day} className={`sim-reference-day ${day === TODAY ? 'is-today' : ''}`} aria-label={`${formatDate(day)}${holiday ? `, ${holiday}` : ''}${lineupTours(day) ? ', mutual opportunity' : ''}${entries.length ? `, ${entries.length} entries` : ''}`} aria-pressed={day === date} onPointerDown={event => monthLongPressStartHandler(day, event)} onPointerMove={monthLongPressMoveHandler} onPointerUp={monthLongPressEndHandler} onPointerCancel={monthLongPressEndHandler} onContextMenu={event => event.preventDefault()} onClick={() => monthDayClick(day)}>
           <span className="sim-reference-date">{i + 1}{payday && <b>$</b>}</span>
           <span className="sim-reference-day-tour">{dayEntries.length ? dayEntries.slice(0, 2).map(band) : tours.day && <span className={`sim-reference-tour ${tours.day}`}>9x{tours.day === 'yellow' && <small>⊘</small>}</span>}</span>
           {holiday && <span className="sim-reference-holiday">{holiday}</span>}
