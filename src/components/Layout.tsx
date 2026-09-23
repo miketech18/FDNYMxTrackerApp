@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpen, ChevronDown, MessageSquare, ShieldCheck, X } from 'lucide-react'
+import { ArrowRight, BookOpen, ChevronDown, MessageSquare, ShieldCheck } from 'lucide-react'
 import { guides } from '../lib/guides'
 
 declare global {
@@ -20,20 +20,9 @@ function getStoreUrl(): string {
 
 export function AnnouncementBanner() {
   const [url] = useState(getStoreUrl)
-  const [dismissed, setDismissed] = useState(() => {
-    try { return localStorage.getItem('banner-dismissed') === '1' } catch { return false }
-  })
-  if (dismissed) return null
   function openLink() { window.open(url, '_blank', 'noopener,noreferrer'); window.umami?.track('click-banner') }
-  function dismiss(e: React.MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
-    setDismissed(true)
-    try { localStorage.setItem('banner-dismissed', '1') } catch { /* ok */ }
-  }
   return <div className="announcement-banner" role="link" tabIndex={0} onClick={openLink} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') openLink() }}>
-    <div className="container"><p><strong>New Features:</strong> · 24hr full access no payment — Vacation Lookup now until 2033 ↗</p></div>
-    <button className="banner-dismiss" onClick={dismiss} aria-label="Dismiss banner"><X size={14} /></button>
+    <div className="container"><p><strong>Latest Additions:</strong> · 24hr full access no payment — Lookup your vacation sets now until 2033 ↗</p></div>
   </div>
 }
 
