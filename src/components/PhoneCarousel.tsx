@@ -13,6 +13,7 @@ const screens = [
   { id: 10, label: 'Find your next mutual' },
   { id: 11, label: 'Your app. The way you work.' },
   { id: 12, label: 'Your FDNY resources, in one place' },
+  { id: 13, label: 'Plan your vacation by seniority' },
 ]
 export function PhoneCarousel() {
   const [active, setActive] = useState(0)

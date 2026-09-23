@@ -32,7 +32,7 @@ export function AnnouncementBanner() {
     try { localStorage.setItem('banner-dismissed', '1') } catch { /* ok */ }
   }
   return <div className="announcement-banner" role="link" tabIndex={0} onClick={openLink} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') openLink() }}>
-    <div className="container"><p>New feature · 24hr full access no payment — no commitment · <strong>Try the best FDNY scheduling app now ↗</strong></p></div>
+    <div className="container"><p>Vacation Lookup is here. Enter your vacation letter and group number to see your scheduled vacations through 2033.</p></div>
     <button className="banner-dismiss" onClick={dismiss} aria-label="Dismiss banner"><X size={14} /></button>
   </div>
 }
