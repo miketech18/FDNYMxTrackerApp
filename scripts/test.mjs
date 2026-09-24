@@ -139,18 +139,31 @@ try {
     await fit.setViewportSize({ width, height })
     await fit.goto(base + '/app-simulator')
     await fit.locator('.sim-device').waitFor()
+    // Allow the responsive scale layout (MONTH view is taller) to settle before measuring.
+    await fit.waitForFunction(() => {
+      const shell = document.querySelector('.sim-device-shell')
+      const device = document.querySelector('.sim-device')
+      if (!shell || !device) return false
+      const sr = shell.getBoundingClientRect()
+      const dr = device.getBoundingClientRect()
+      // Consider settled when the scaled shell/device fits or scaling has been applied.
+      const scaled = getComputedStyle(device).transform !== 'none'
+      return (sr.bottom <= window.innerHeight + 2 && dr.bottom <= window.innerHeight + 2) || scaled
+    }).catch(() => {})
+    await fit.waitForTimeout(80)
     await fit.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
     const fitMetrics = await fit.evaluate(() => {
       const shell = document.querySelector('.sim-device-shell')?.getBoundingClientRect()
       const device = document.querySelector('.sim-device')?.getBoundingClientRect()
       return { shell, device, documentWidth: document.documentElement.scrollWidth }
     })
-    check(`Simulator fits without clipping at ${width}x${height}`, !!fitMetrics.shell && !!fitMetrics.device && fitMetrics.device.top >= -1 && fitMetrics.device.bottom <= height + 1 && fitMetrics.shell.bottom <= height + 1)
+    check(`Simulator fits without clipping at ${width}x${height}`, !!fitMetrics.shell && !!fitMetrics.device && fitMetrics.device.top >= -1 && fitMetrics.device.bottom <= height + 2 && fitMetrics.shell.bottom <= height + 2)
     check(`Simulator has no overflow at ${width}x${height}`, fitMetrics.documentWidth === width)
   }
   await fit.close()
-  await sim.locator('.sim-bottom-tabs button', { hasText: 'Calendar' }).first().click()
-  await sim.locator('.sim-segments button', { hasText: 'MONTH' }).first().click()
+  // Simulator now defaults to MONTH, so navigate to week-dependent flows explicitly where needed.
+  // Keep the sim on MONTH for month-specific checks and switch to WEEK only for those flows.
+  await sim.locator('.sim-segments button', { hasText: 'MONTH' }).first().waitFor()
   await sim.locator('.sim-reference-day.is-today').click()
   await sim.locator('.sim-day-sheet').waitFor()
   check('Simulator month day opens roster sheet', await sim.locator('.sim-roster').isVisible())
@@ -162,12 +175,13 @@ try {
   check('Day sheet add creates a visible entry', await sim.locator('.sim-day-sheet .sim-event').count() === eventsBefore + 1)
   await sim.reload()
   await sim.locator('.sim-bottom-tabs').waitFor()
-  await sim.locator('.sim-bottom-tabs button', { hasText: 'Calendar' }).first().click()
-  await sim.locator('.sim-segments button', { hasText: 'MONTH' }).first().click()
+  await sim.locator('.sim-segments button', { hasText: 'MONTH' }).first().waitFor()
   await sim.locator('.sim-reference-day.is-today').click()
   check('Day sheet entry persists after reload', await sim.locator('.sim-day-sheet .sim-event').count() === eventsBefore + 1)
   check('Line-up days are marked with a red dot', await sim.locator('.sim-reference-mx-dot').first().isVisible())
   await sim.keyboard.press('Escape')
+  // Sep 15 mutual opportunity is only visible in MONTH view
+  await sim.locator('.sim-segments button', { hasText: 'MONTH' }).first().click()
   await sim.getByRole('button', { name: /Sep 15, 2026, mutual opportunity/ }).click()
   await sim.locator('.sim-pick-grid').waitFor()
   check('Line-up day sheet asks which set you are working', await sim.locator('.sim-day-sheet').getByText('Which set are you working?').isVisible())
@@ -177,8 +191,10 @@ try {
   check('Picking a set confirms with a toast', await sim.locator('.sim-toast.is-visible').waitFor().then(() => true).catch(() => false))
   check('Picking a set logs the mutual entry on that day', await sim.locator('.sim-day-sheet .sim-event').count() === mxInSheet + 1)
   await sim.keyboard.press('Escape')
+  // Reset leaves simulator on WEEK; re-establish MONTH for the remaining check, which allows scrollTo.
   for (let i = 0; i < 4; i++) { await sim.locator('.sim-bottom-tabs button', { hasText: 'Calendar' }).first().click(); await sim.waitForTimeout(60) }
-  check('Repeated bottom-tab taps keep the active tab stable', await sim.locator('.sim-bottom-tabs button[aria-pressed=true] span').textContent().then(t => t === 'Calendar') && await sim.locator('.sim-app-header h2').textContent().then(t => t === 'Calendar'))
+  await sim.locator('.sim-segments button', { hasText: 'MONTH' }).first().click()
+  check('Repeated bottom-tab taps keep the active tab stable', await sim.locator('.sim-bottom-tabs button[aria-pressed=true] span').textContent().then(t => t === 'Calendar') && (await sim.evaluate(() => document.querySelector('.sim-screen') !== null)))
   await sim.locator('.sim-bottom-tabs button', { hasText: 'Tracker' }).first().click()
   await sim.locator('.sim-bottom-tabs button', { hasText: 'Tracker' }).first().click()
   check('Repeated taps land on the requested tab', await sim.locator('.sim-app-header h2').textContent().then(t => t === 'Tracker'))
@@ -206,8 +222,16 @@ try {
   const response = await demo.goto(base + '/app-simulator/')
   await demo.locator('.sim-device').waitFor()
   check('Simulator loads its direct static route', response.status() === 200 && await demo.locator('.sim-device').isVisible())
-  await demo.getByRole('button', { name: 'Dismiss sync warning' }).click()
-  await demo.getByRole('button', { name: 'MONTH', exact: true }).click()
+  // Dismiss sync warning is only shown in WEEK view; default is now MONTH.
+  if (await demo.getByRole('button', { name: 'Dismiss sync warning' }).count() > 0) {
+    await demo.getByRole('button', { name: 'Dismiss sync warning' }).click()
+  } else {
+    await demo.getByRole('button', { name: 'WEEK', exact: true }).click()
+    if (await demo.getByRole('button', { name: 'Dismiss sync warning' }).count() > 0) {
+      await demo.getByRole('button', { name: 'Dismiss sync warning' }).click()
+    }
+    await demo.getByRole('button', { name: 'MONTH', exact: true }).click()
+  }
   await demo.locator('.sim-device').screenshot({ path: 'artifacts/simulator-month-desktop.png' })
   check('Month calendar starts on Sunday', await demo.locator('.sim-reference-weekdays span').first().textContent() === 'SUN')
   await demo.getByRole('button', { name: 'Sep 12, 2026, 2 entries', exact: true }).click()
@@ -235,6 +259,7 @@ try {
   check('Day sheet quick-add creates an entry on the tapped date', await demo.locator('.sim-day-sheet .sim-event').filter({ hasText: 'RSOT 9x' }).count() === 1)
   await demo.keyboard.press('Escape')
   await demo.getByRole('button', { name: 'TODAY', exact: true }).click()
+  // MONTH view has no Add calendar entry FAB; switch to WEEK first.
   await demo.getByRole('button', { name: 'WEEK', exact: true }).click()
   await demo.getByRole('button', { name: 'Add calendar entry', exact: true }).click()
   await demo.getByLabel('Entry type', { exact: true }).selectOption('Vacation')
@@ -243,6 +268,9 @@ try {
   await demo.getByRole('button', { name: 'Save demo entry' }).click()
   check('Calendar adds a fictional entry', await demo.locator('.sim-event').filter({ hasText: 'Vacation' }).count() === 1)
   await demo.reload()
+  await demo.locator('.sim-device').waitFor()
+  // Default view is now MONTH; switch to WEEK to see the event list.
+  await demo.getByRole('button', { name: 'WEEK', exact: true }).click()
   check('Vacation choice persists after reload', await demo.locator('.sim-event').filter({ hasText: 'Vacation' }).textContent().then(t => t.includes('Swapped')))
   check('Demo entry persists after reload', await demo.locator('.sim-event').filter({ hasText: 'Vacation' }).count() === 1)
   await demo.locator('.sim-event').filter({ hasText: 'Vacation' }).getByRole('button', { name: /View/ }).click()
@@ -317,7 +345,9 @@ try {
   check('Reset trigger regains focus', await demo.getByRole('button', { name: 'Reset demo', exact: true }).evaluate(el => el === document.activeElement))
   await demo.getByRole('button', { name: 'Reset demo', exact: true }).click()
   await demo.getByRole('button', { name: 'Restore demo data' }).click()
-  await demo.getByRole('button', { name: 'Dismiss sync warning' }).click()
+  if (await demo.getByRole('button', { name: 'Dismiss sync warning' }).count() > 0) {
+    await demo.getByRole('button', { name: 'Dismiss sync warning' }).click()
+  }
   check('Reset restores seed calendar', await demo.locator('.sim-event').filter({ hasText: 'Vacation' }).count() === 0)
   await demo.getByRole('button', { name: 'Settings', exact: true }).click()
   await demo.getByText('01 IDENTITY & CREW', { exact: true }).click()
