@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowDown, ArrowRight, ArrowUpRight, BookOpen, CalendarDays, DoorOpen, MapPin, MessageSquare, ScanLine, ShieldCheck, Users } from 'lucide-react'
+import { ArrowDown, ArrowRight, ArrowUpRight, BadgeDollarSign, BookOpen, CalendarDays, DoorOpen, MapPin, MessageSquare, ShieldCheck, Smartphone, WifiOff } from 'lucide-react'
 import { PhoneCarousel } from '../components/PhoneCarousel'
 import { StoreButtons } from '../components/Layout'
 import { guides } from '../lib/guides'
@@ -22,9 +22,9 @@ function useRotator(length: number, interval = ROTATOR_INTERVAL_MS) {
 export function Home({ onFeedback }: { onFeedback: () => void }) {
   return <>
     <section className="hero-section"><div className="container hero-grid">
-      <div className="hero-copy"><p className="eyebrow hero-eyebrow"><span className="status-dot" /> V4.9.5 IS 10-84 <span className="eyebrow-divider" /> READY FOR YOUR NEXT TOUR</p><h1>BUILT BY AN FDNY<br />FIREFIGHTER.<br /><span className="brass-text">MADE FOR OUR JOB.</span><br /><span className="red-text">EVERYTHING WE NEED.</span></h1><div className="home-simulator-cta"><Link className="button-outline button-outline--brass" to="/app-simulator">Try the app simulator <ArrowRight size={16} /></Link></div><a className="explore-link" href="#field-guide">Get more from your tracker <ArrowDown size={16} /></a></div>
+      <div className="hero-copy"><p className="eyebrow hero-eyebrow"><span className="status-dot" /> <span className="hero-tencode">10-84</span> <span className="eyebrow-divider" /> READY FOR YOUR NEXT TOUR</p><h1>BUILT BY AN FDNY<br />FIREFIGHTER.<br /><span className="brass-text">MADE FOR OUR JOB.</span><br /><span className="red-text">EVERYTHING WE NEED.</span></h1><div className="home-simulator-cta"><Link className="button-outline button-outline--brass" to="/app-simulator">Try the app simulator <ArrowRight size={16} /></Link></div><a className="explore-link" href="#field-guide">Get more from your tracker <ArrowDown size={16} /></a></div>
       <PhoneCarousel />
-    </div><div className="container hero-trust hero-features"><span><ArrowRight size={14} /> Online Mutual Swaps</span><span className="trust-separator" aria-hidden="true" /><span><Users size={14} /> Family Share calendar — automatically updated</span><span className="trust-separator" aria-hidden="true" /><span><DoorOpen size={14} /> Door Codes</span><span className="trust-separator" aria-hidden="true" /><span><ScanLine size={14} /> Scan OT Sheet to find missing marks</span><span className="trust-separator" aria-hidden="true" /><span><ArrowRight size={14} /> Swap sets online with your MX partner</span></div></section>
+    </div><div className="container hero-trust hero-features"><span><WifiOff size={14} /> Works with no signal in the firehouse</span><span className="trust-separator" aria-hidden="true" /><span><Smartphone size={14} /> Home-screen widget with your next tour</span><span className="trust-separator" aria-hidden="true" /><span><DoorOpen size={14} /> Door codes, phone numbers &amp; FDNY links</span><span className="trust-separator" aria-hidden="true" /><span><MapPin size={14} /> Unit Locator — take it on the hop</span><span className="trust-separator" aria-hidden="true" /><span><BadgeDollarSign size={14} /> $10 a year — less than one detail</span></div></section>
     <section className="quick-help-section" id="field-guide"><div className="container"><div className="section-heading"><div><p className="eyebrow">YOUR POCKET FIELD GUIDE</p><h2>Drill in the kitchen.</h2></div><Link className="text-link" to="/guides">All how-to guides <ArrowUpRight size={17} /></Link></div>
       <div className="quick-help-grid"><button className="feedback-card" onClick={onFeedback}><span className="feedback-card-top"><span className="card-icon"><MessageSquare size={23} /></span><span className="feedback-card-label">YOUR VOICE MATTERS</span><ArrowUpRight size={20} /></span><span className="feedback-card-title">HELP BUILD A BETTER APP.</span><span className="feedback-card-description">Found a bug? Have an idea?<br />Let’s make the next tour even better.</span><span className="feedback-card-cta">Send feedback <ArrowRight size={17} /></span></button>
       {guides.map(guide => <Link key={guide.slug} to={`/guides/${guide.slug}`} className="guide-card" data-umami-event="guide-click" data-umami-event-guide={guide.slug} data-umami-event-location="home"><div className="guide-card-top"><span className="card-icon"><guide.icon size={23} /></span><span className="guide-label">HOW-TO GUIDE</span><ArrowUpRight size={18} /></div><h3>{guide.shortTitle}</h3><p>{guide.description}</p><div className="guide-card-bottom"><span>Read the guide <ArrowRight size={16} /></span><small>{guide.time}</small></div></Link>)}
@@ -66,7 +66,7 @@ function LocatorRotator() {
               <span className="small-icon"><CalendarDays size={22} /></span>
               <p className="eyebrow">WHEN'S YOUR NEXT VACATION?</p>
               <h2>VACATION LOOKUP.</h2>
-              <p>Just enter your vacation letter and group number to find your vacation sets until 2032.</p>
+              <p>Just enter your vacation letter and group number to find your vacation sets until 2033.</p>
 
             </div>
             <div className="locator-image"><img src="/images/screen-13.webp" alt="Vacation Lookup showing vacation sets by seniority" loading="lazy" /></div>

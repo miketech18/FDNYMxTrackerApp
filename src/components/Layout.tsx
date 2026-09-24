@@ -37,7 +37,9 @@ export function Header({ onFeedback, showAnnouncement = true }: { onFeedback: ()
     if (open) document.addEventListener('keydown', keyboard)
     return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', keyboard) }
   }, [open])
-  return <header className="site-header">{showAnnouncement && <AnnouncementBanner />}<div className="container header-inner">
+  // The announcement scrolls away with the page; only the nav bar stays pinned, so
+  // the sticky header never eats more than one row of the viewport.
+  return <>{showAnnouncement && <AnnouncementBanner />}<header className="site-header"><div className="container header-inner">
     <Link to="/" className="brand" aria-label="FDNY Mutual Tracker home"><img src="/images/app-icon.webp" alt="FDNY Mutual Tracker emblem" /><span className="brand-wordmark">FDNY <span>MUTUAL TRACKER</span><small>BUILT FOR THE FIREHOUSE.</small></span></Link>
     <nav className="header-actions" aria-label="Main navigation">
       <span className="release-badge">v4.9.5</span>
@@ -47,7 +49,7 @@ export function Header({ onFeedback, showAnnouncement = true }: { onFeedback: ()
       </div>
       <button className="button-outline nav-feedback" onClick={onFeedback}><MessageSquare size={17} /><span>Send feedback</span><ArrowRight size={16} /></button>
     </nav>
-  </div></header>
+  </div></header></>
 }
 
 export function AppleIcon() {
@@ -60,7 +62,17 @@ export function StoreButtons() {
   return <div className="store-buttons"><a className="store-button" href="https://apps.apple.com/us/app/fdny-mutual-tracker/id6778679353" target="_blank" rel="noreferrer" data-umami-event="click-app-store"><AppleIcon /><span><small>Download on the</small><strong>App Store</strong></span></a><a className="store-button" href="https://play.google.com/store/apps/details?id=com.mauch.fdnyscheduler" target="_blank" rel="noreferrer" data-umami-event="click-play-store"><PlayIcon /><span><small>GET IT ON</small><strong>Google Play</strong></span></a></div>
 }
 export function DownloadBar() {
-  return <aside className="download-bar" aria-label="Download the app"><div className="container download-inner"><div className="download-brand"><img src="/images/app-icon.webp" alt="" /><span><strong>Your next tour. All squared away.</strong><small>FDNY Mutual Tracker · iOS & Android</small></span></div><StoreButtons /></div></aside>
+  // Once the in-page download section is on screen the bar is a duplicate CTA, so it steps aside.
+  // The caller keys this component by route, which resets the state on navigation.
+  const [covered, setCovered] = useState(false)
+  useEffect(() => {
+    const section = document.querySelector('.download-section')
+    if (!section || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(entries => setCovered(entries[0].isIntersecting))
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+  return <aside className={`download-bar${covered ? ' is-hidden' : ''}`} aria-label="Download the app" aria-hidden={covered || undefined}><div className="container download-inner"><div className="download-brand"><img src="/images/app-icon.webp" alt="" /><span><strong>Your next tour. All squared away.</strong><small>FDNY Mutual Tracker · iOS & Android</small></span></div><StoreButtons /></div></aside>
 }
 export function Footer({ onFeedback }: { onFeedback: () => void }) {
   return <footer className="site-footer"><div className="container"><div className="footer-top"><Link to="/" className="footer-name">FDNY <span>MUTUAL TRACKER</span></Link><div><Link to="/guides">How-to guides</Link><button onClick={onFeedback}>Send feedback</button><a href="https://miketech18.github.io/fdny-mutual-tracker-privacy/legal.html#privacy" target="_blank" rel="noreferrer">Privacy</a><a href="https://miketech18.github.io/fdny-mutual-tracker-privacy/legal.html#terms" target="_blank" rel="noreferrer">Terms</a></div></div><div className="footer-bottom"><p>© 2026 FDNY Mutual Tracker. Built by an active FDNY firefighter.<br />Not affiliated with the FDNY or the City of New York.</p><span><ShieldCheck size={16} /> Your calendar. Your data.</span></div></div></footer>

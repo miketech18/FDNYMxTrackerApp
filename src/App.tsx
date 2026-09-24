@@ -35,7 +35,7 @@ function AppContent() {
         </Routes>
       </main>
       <Footer onFeedback={() => setFeedback(true)} />
-      {location.pathname.replace(/\/$/, '') !== '/app-simulator' && <DownloadBar />}
+      {location.pathname.replace(/\/$/, '') !== '/app-simulator' && <DownloadBar key={`download-${location.pathname}`} />}
       {feedback && <FeedbackModal onClose={() => setFeedback(false)} context={location.pathname} />}
     </>
   )

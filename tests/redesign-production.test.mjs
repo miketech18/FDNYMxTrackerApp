@@ -69,6 +69,34 @@ test('the built Pages artifact contains every direct route and no preview instru
   }
 })
 
+test('every built route declares its own canonical URL, title and social tags', async () => {
+  const expected = {
+    'dist/index.html': 'https://fdnymxtrackerapp.harvestave.org/',
+    'dist/app-simulator/index.html': 'https://fdnymxtrackerapp.harvestave.org/app-simulator',
+    'dist/guides/index.html': 'https://fdnymxtrackerapp.harvestave.org/guides',
+    'dist/guides/share-calendar/index.html': 'https://fdnymxtrackerapp.harvestave.org/guides/share-calendar',
+    'dist/guides/send-mxp-mutuals/index.html': 'https://fdnymxtrackerapp.harvestave.org/guides/send-mxp-mutuals',
+    'dist/guides/overtime-equalization/index.html': 'https://fdnymxtrackerapp.harvestave.org/guides/overtime-equalization',
+    'dist/how-to-share-calendar.html': 'https://fdnymxtrackerapp.harvestave.org/guides/share-calendar',
+    'dist/Send-MxP-Mutuals.html': 'https://fdnymxtrackerapp.harvestave.org/guides/send-mxp-mutuals',
+    'dist/how-to-overtime-equalization.html': 'https://fdnymxtrackerapp.harvestave.org/guides/overtime-equalization',
+  }
+  const titles = new Set()
+
+  for (const [path, canonical] of Object.entries(expected)) {
+    const html = await read(path)
+    const escaped = canonical.replaceAll('.', '\\.')
+    assert.match(html, new RegExp(`<link rel="canonical" href="${escaped}"`), `${path} must point its canonical at its own URL`)
+    assert.match(html, new RegExp(`<meta property="og:url" content="${escaped}"`), `${path} must publish its own og:url`)
+    const title = html.match(/<title>([^<]+)<\/title>/)?.[1]
+    assert.ok(title, `${path} must have a title`)
+    titles.add(title)
+  }
+
+  assert.equal(titles.size, 6, 'the home page, simulator, guide index and three guides need distinct titles')
+  assert.match(await read('dist/404.html'), /<meta name="robots" content="noindex" \/>/, 'the not-found page must stay out of the index')
+})
+
 test('local tooling and private experiment archives cannot be staged accidentally', async () => {
   const gitignore = await read('.gitignore')
 
@@ -97,8 +125,12 @@ test('the overtime equalization guide uses its dedicated route and source assets
   assert.match(overtimeGuide, /Calendar hours/)
   assert.match(overtimeGuide, /fdny-howto3-checks/)
   for (const image of [1, 2, 3, 4]) {
-    assert.match(overtimeGuide, new RegExp(`/images/equalization-step-${image}\\.png`))
+    assert.match(overtimeGuide, new RegExp(`/images/equalization-step-${image}\\.webp`))
   }
+  // These screenshots must ship as sized WebP; the multi-megabyte PNGs must not come back.
+  const shipped = (await readdir(new URL('../public/images/', import.meta.url))).filter(file => file.startsWith('equalization-step-'))
+  assert.ok(shipped.length === 4, 'expected four equalization screenshots')
+  for (const file of shipped) assert.match(file, /\.webp$/, `${file} must ship as WebP`)
 })
 
 test('the overtime equalization guide explains the full scan workflow and exposes an accessible image dialog', async () => {
@@ -135,17 +167,15 @@ test('self-hosted WOFF2 fonts declare the correct format', async () => {
   assert.match(css, /\.woff2'\) format\('woff2'\)/)
 })
 
-test('all current website version labels identify release 4.9.5', async () => {
-  const currentWebsiteFiles = [
-    'src/pages/Home.tsx',
-    'src/components/Layout.tsx',
-  ]
+test('the release version is stated once, in the site header', async () => {
+  const [home, layout] = await Promise.all([
+    read('src/pages/Home.tsx'),
+    read('src/components/Layout.tsx'),
+  ])
 
-  for (const path of currentWebsiteFiles) {
-    const contents = await read(path)
-    assert.match(contents, /4\.9\.5/, `${path} must show version 4.9.5`)
-    assert.doesNotMatch(contents, /4\.6\.0/, `${path} must not show version 4.6.0`)
-  }
+  assert.match(layout, /4\.9\.5/, 'the header release badge must show version 4.9.5')
+  assert.doesNotMatch(home, /4\.9\.5/, 'the homepage must not repeat the version label')
+  assert.doesNotMatch(layout, /4\.6\.0/, 'the site must not show version 4.6.0')
 })
 
 test('simulator direct route is explicitly included in the Pages routeFiles list', async () => {
@@ -175,7 +205,13 @@ test('simulator uses isolated local state without backend or analytics calls', a
     assert.doesNotMatch(source, /\bfetch\s*\(|XMLHttpRequest|WebSocket|sendBeacon|firebase|umami|https?:\/\//i)
   }
   assert.match(await read('src/lib/simulator.ts'), /fdnymx\.demo\./)
-  assert.equal(await read('dist/app-simulator/index.html'), await read('dist/index.html'))
+  // The simulator route serves the same compiled app shell as the rest of the site;
+  // only its head metadata differs. Compare the shell, not the whole document.
+  const shellScript = html => html.match(/<script type="module"[^>]*src="([^"]+)"/)?.[1]
+  const [home, simulator] = await Promise.all([read('dist/index.html'), read('dist/app-simulator/index.html')])
+  assert.ok(shellScript(home), 'the home route must load the compiled app')
+  assert.equal(shellScript(simulator), shellScript(home), 'the simulator route must load the same compiled app')
+  assert.doesNotMatch(simulator, /designarena|rrweb|data-element-picker/i)
 })
 
 test('analytics excludes simulator direct loads and SPA events', async () => {
