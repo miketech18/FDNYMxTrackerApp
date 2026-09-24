@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, ArrowLeftRight, Bell, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardList, Clock3, Flame, Info, Plus, RotateCcw, Settings as SettingsIcon, ShieldCheck, Users, X } from 'lucide-react'
 import { crew, defaultColors, DEMO_KEY, entryLabel, entryTypes, formatDate, hoursText, isOT, iso, loadDemo, onDate, seedDemo, shiftDate, sumHours, TODAY, type DemoState, type Entry, type EntryType } from '../lib/simulator'
@@ -67,7 +67,7 @@ export function AppSimulator() {
   const [deviceHeight, setDeviceHeight] = useState(0)
   const monthLongPressTimer = useRef<number | null>(null)
   const monthLongPressTriggered = useRef(false)
-  const monthLongPressStart = useRef<{ x: number; y: number } | null>(null)
+  const monthLongPressStart = useRef<{ x: number; y: number; pointerId: number } | null>(null)
   useLayoutEffect(() => {
     const shell = deviceShell.current
     const device = shell?.querySelector<HTMLElement>('.sim-device')
@@ -174,10 +174,10 @@ export function AppSimulator() {
     }
     monthLongPressStart.current = null
   }
-  function monthLongPressStartHandler(day: string, event: PointerEvent<HTMLButtonElement>) {
+  function monthLongPressStartHandler(day: string, event: ReactPointerEvent<HTMLButtonElement>) {
     clearMonthLongPress()
     monthLongPressTriggered.current = false
-    monthLongPressStart.current = { x: event.clientX, y: event.clientY }
+    monthLongPressStart.current = { x: event.clientX, y: event.clientY, pointerId: event.pointerId }
     monthLongPressTimer.current = window.setTimeout(() => {
       monthLongPressTriggered.current = true
       setDate(day)
@@ -186,27 +186,53 @@ export function AppSimulator() {
       monthLongPressTimer.current = null
     }, 550)
   }
-  function monthLongPressMoveHandler(event: PointerEvent<HTMLButtonElement>) {
+  function monthLongPressMoveHandler(event: ReactPointerEvent<HTMLButtonElement>) {
     const start = monthLongPressStart.current
-    if (!start || Math.hypot(event.clientX - start.x, event.clientY - start.y) <= 10) return
-    clearMonthLongPress()
-  }
-  function monthLongPressEndHandler() {
-    clearMonthLongPress()
-    if (monthLongPressTriggered.current) {
-      // Suppress the synthetic click produced after a completed long press, but
-      // do not let that suppression affect the next unrelated control click.
-      window.setTimeout(() => { monthLongPressTriggered.current = false }, 0)
+    if (!start || start.pointerId !== event.pointerId || Math.hypot(event.clientX - start.x, event.clientY - start.y) <= 10) return
+    if (monthLongPressTimer.current !== null) {
+      window.clearTimeout(monthLongPressTimer.current)
+      monthLongPressTimer.current = null
     }
   }
-  function monthDayClick(day: string) {
+  function monthDayClick(day: string, event: ReactMouseEvent<HTMLButtonElement>) {
     if (monthLongPressTriggered.current) {
       monthLongPressTriggered.current = false
-      return
+      if (event.detail > 0) return
     }
     setDate(day)
     setModal({ kind: 'day', date: day })
   }
+  // The long-press switches views and unmounts its day button before pointerup, so finish at window level.
+  useEffect(() => {
+    const clearGesture = () => {
+      if (monthLongPressTimer.current !== null) {
+        window.clearTimeout(monthLongPressTimer.current)
+        monthLongPressTimer.current = null
+      }
+      monthLongPressStart.current = null
+    }
+    const finishPointer = (event: PointerEvent) => {
+      if (monthLongPressStart.current?.pointerId !== event.pointerId) return
+      clearGesture()
+      if (monthLongPressTriggered.current) {
+        // Allow the browser's synthetic click to be suppressed before clearing the gesture state.
+        window.setTimeout(() => { monthLongPressTriggered.current = false }, 0)
+      }
+    }
+    const cancelPointer = (event: PointerEvent) => {
+      if (monthLongPressStart.current?.pointerId !== event.pointerId) return
+      clearGesture()
+      monthLongPressTriggered.current = false
+    }
+    window.addEventListener('pointerup', finishPointer, true)
+    window.addEventListener('pointercancel', cancelPointer, true)
+    return () => {
+      window.removeEventListener('pointerup', finishPointer, true)
+      window.removeEventListener('pointercancel', cancelPointer, true)
+      clearGesture()
+      monthLongPressTriggered.current = false
+    }
+  }, [])
   function monthTours(day: string) {
     // Fictional tour pattern matching the reference calendar's two group bands.
     const dayNumber = Number(day.slice(-2))
@@ -267,7 +293,7 @@ export function AppSimulator() {
         function band(e: Entry) {
           return <span key={e.id} className="sim-reference-entry" style={{ background: ['Awaiting Relief', 'Portal 2 Portal'].includes(e.type) ? '#FF8200' : color(e.type), color: ink(color(e.type)) }}>{entryLabel(e)}{e.complete && ' ✓'}</span>
         }
-        return <button key={day} className={`sim-reference-day ${day === TODAY ? 'is-today' : ''}`} aria-label={`${formatDate(day)}${holiday ? `, ${holiday}` : ''}${lineupTours(day) ? ', mutual opportunity' : ''}${entries.length ? `, ${entries.length} entries` : ''}`} aria-pressed={day === date} onPointerDown={event => monthLongPressStartHandler(day, event)} onPointerMove={monthLongPressMoveHandler} onPointerUp={monthLongPressEndHandler} onPointerCancel={monthLongPressEndHandler} onContextMenu={event => event.preventDefault()} onClick={() => monthDayClick(day)}>
+        return <button key={day} className={`sim-reference-day ${day === TODAY ? 'is-today' : ''}`} aria-label={`${formatDate(day)}${holiday ? `, ${holiday}` : ''}${lineupTours(day) ? ', mutual opportunity' : ''}${entries.length ? `, ${entries.length} entries` : ''}`} aria-pressed={day === date} onPointerDown={event => monthLongPressStartHandler(day, event)} onPointerMove={monthLongPressMoveHandler} onContextMenu={event => event.preventDefault()} onClick={event => monthDayClick(day, event)}>
           <span className="sim-reference-date">{i + 1}{payday && <b>$</b>}</span>
           <span className="sim-reference-day-tour">{dayEntries.length ? dayEntries.slice(0, 2).map(band) : tours.day && <span className={`sim-reference-tour ${tours.day}`}>9x{tours.day === 'yellow' && <small>⊘</small>}</span>}</span>
           {holiday && <span className="sim-reference-holiday">{holiday}</span>}
@@ -343,9 +369,9 @@ export function AppSimulator() {
       <Accordion title="02 OPERATIONAL TOOLS">{row('Open operational tools', () => showPage('Operational Tools'), 'Door codes, navigation, links & numbers')}</Accordion>
       <Accordion title="03 APPEARANCE" meta="CUSTOM">{row('Edit Colors', () => showPage('Edit Colors'), 'Tour colors & presets')}</Accordion>
       <Accordion title="04 DATA & MAINTENANCE" meta={data.backedUp ? 'DEMO SNAPSHOT' : 'NOT BACKED UP'}>{row('Backup now', () => { update({ backedUp: true }); setToast('Demo backup preview complete. No data left this browser.') }, 'Simulated backup only')}{['Import data', 'Calendar sync', 'Transfer data'].map(name => <div key={name}>{row(name, () => info(`${name} · demo`, 'This preview does not import, export, or sync records. Reset demo restores the fictional sample.'))}</div>)}</Accordion>
-      <Accordion title="05 ABOUT & SUPPORT" meta="v4.8.0"><Panel><h3>FDNY MUTUAL TRACKER</h3><p>Version 4.8.0 · Interactive demo</p><small>Not affiliated with the FDNY or City of New York.</small></Panel>{row('View subscription preview', () => setModal({ kind: 'paywall' }))}</Accordion>
+      <Accordion title="05 ABOUT & SUPPORT" meta="v4.9.5"><Panel><h3>FDNY MUTUAL TRACKER</h3><p>Version 4.9.5 · Interactive demo</p><small>Not affiliated with the FDNY or City of New York.</small></Panel>{row('View subscription preview', () => setModal({ kind: 'paywall' }))}</Accordion>
       <Accordion title="06 SEND FEEDBACK & SHARE">{row('Feedback preview', () => info('Feedback · demo', 'No message will be sent from this simulator. Use the website’s Send feedback button outside the phone if you want to contact the developer.'))}{row('Share preview', () => info('Share the demo', 'Visitors can explore this same fictional app at /app-simulator. Browser-local changes are never shared.'))}</Accordion>
-      <img className="sim-watermark" src="/images/app-icon.webp" alt="" /><p className="sim-version">FDNY MUTUAL TRACKER · v4.8.0</p>
+      <img className="sim-watermark" src="/images/app-icon.webp" alt="" /><p className="sim-version">FDNY MUTUAL TRACKER · v4.9.5</p>
     </>
   }
   const detail = modal?.kind === 'detail' ? data.entries.find(e => e.id === modal.id) : undefined

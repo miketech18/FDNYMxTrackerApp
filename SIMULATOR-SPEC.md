@@ -69,7 +69,7 @@ Dark UI. Extract from screenshots; these are from the app's real Edit Colors scr
 ### Settings tab (numbered accordions `01–06`)
 | Ref | Screen | Key elements |
 |---|---|---|
-| 25 | Settings index | `L99 · GROUP 10 · TEST MUTUAL SWAPS`; `01 IDENTITY & CREW — CONNECTED`: My Group & MX Partner (`10 / 10`), My Crew Profile, Rank (Firefighter/Officer segmented); `02 OPERATIONAL TOOLS`; `03 APPEARANCE — CUSTOM`; `04 DATA & MAINTENANCE — NOT BACKED UP` (red); `05 ABOUT & SUPPORT — v4.8.0`; `06 SEND FEEDBACK & SHARE`; FDNY badge watermark |
+| 25 | Settings index | `L99 · GROUP 10 · TEST MUTUAL SWAPS`; `01 IDENTITY & CREW — CONNECTED`: My Group & MX Partner (`10 / 10`), My Crew Profile, Rank (Firefighter/Officer segmented); `02 OPERATIONAL TOOLS`; `03 APPEARANCE — CUSTOM`; `04 DATA & MAINTENANCE — NOT BACKED UP` (red); `05 ABOUT & SUPPORT — v4.9.5`; `06 SEND FEEDBACK & SHARE`; FDNY badge watermark |
 | 26 | Operational Tools | Door Codes; Navigate to FDNY Unit; FDNY Links; Phone Numbers |
 | 27 | FDNY Links | List of official FDNY resources (divisions, units, portal) |
 | 28 | Telephone Numbers | Directory list: name/role + tap-to-call rows |
@@ -108,7 +108,7 @@ Settings: accordions 01–06 → sub-pages (Ops Tools, Links, Numbers, Colors, D
 - Keep some screens showing their empty states (MX Partner, Offers, Board, Comp Time zero state) to mirror the app.
 - Calendar chips must include at least: MSOT 9x, RSOT 9x, MSOT 6x, AR 45m, P2P 75m, MX Off 6x, Other OT, +Medical, Vacation, Crew On/Off.
 - Include the "Stay Low" card on Week view and a dismissible demo variant of the Sync Warning dialog (never real errors, no retries against network).
-- Keep version label `v4.8.0` and the paywall as inert demo content.
+- Keep version label `v4.9.5` and the paywall as inert demo content.
 
 ## 8. Page chrome (outside the phone frame)
 
@@ -125,4 +125,4 @@ Settings: accordions 01–06 → sub-pages (Ops Tools, Links, Numbers, Colors, D
 - **Full verification gate:** `npm test` = build (tsc + vite + prepare-pages) → test:source → lint → test:ui. Run it before finishing.
 - **localStorage:** existing site keys look like `fdny-howto3-checks`; the simulator must use its own namespace (e.g. `fdnymx.demo.*`) and must never touch existing keys.
 - **Analytics:** the site fires Umami events on some clicks — the simulator must fire none (consistent with the no-network rule).
-- **Version label:** site/app version is `4.8.0` (package.json). Do not bump it.
+- **Version label:** site/app version is `4.9.5` (package.json). Do not bump it.
