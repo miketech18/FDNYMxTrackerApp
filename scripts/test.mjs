@@ -2,6 +2,7 @@ import { createServer } from 'node:http'
 import { readFile, stat, mkdir } from 'node:fs/promises'
 import { resolve, extname } from 'node:path'
 import { chromium } from '@playwright/test'
+import { measureTargets, describeTarget } from './tap-targets.mjs'
 
 const root = resolve('dist')
 const server = createServer(async (req, res) => {
@@ -395,10 +396,38 @@ try {
   check('Simulator makes no external requests', externalRequests.length === 0)
   check('Simulator makes no backend requests', backendRequests.length === 0)
   // WCAG 2.5.8 target size: every control must offer a 24x24 CSS px hit region.
-  // The widget is measured by pushing elementFromPoint outward from the control's
-  // centre, so padding and ::after overlays count as target area.
+  // measureTargets pushes elementFromPoint outward from each control's centre, so
+  // padding and ::after overlays count as target area. It lives in
+  // scripts/tap-targets.mjs, and the standalone audit imports the same function.
   const targetPage = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 })
   targetPage.on('pageerror', error => failures.push(error.message))
+
+  // Prove the probe before trusting it. A 12x12 control must be caught, a 30x10
+  // control must be caught for its height, a control sitting exactly on the 24px
+  // line must clear, and a 4x4 control whose ::after grows it to 28x28 must count
+  // as target area rather than a failure. The textarea is there to keep the
+  // selector whole: the audit used to sweep textareas while the guard did not.
+  await targetPage.setContent(`<!doctype html><meta charset="utf-8"><style>
+    body { margin: 0; padding: 40px; background: #111; }
+    button, textarea { display: block; box-sizing: border-box; border: 0; padding: 0; background: #444; }
+    #exact { width: 24px; height: 24px; }
+    #small { width: 12px; height: 12px; margin-top: 20px; }
+    #short { width: 30px; height: 10px; margin-top: 20px; }
+    #area { width: 12px; height: 12px; margin-top: 20px; resize: none; }
+    #padded { position: relative; width: 4px; height: 4px; margin-top: 40px; }
+    #padded::after { content: ''; position: absolute; inset: -12px; }
+  </style>
+  <button id="exact" aria-label="exact"></button>
+  <button id="small" aria-label="small"></button>
+  <button id="short" aria-label="short"></button>
+  <textarea id="area" aria-label="area"></textarea>
+  <button id="padded" aria-label="padded"></button>`)
+  const fixture = (await measureTargets(targetPage)).filter(item => item.undersized).map(item => item.text)
+  check('Target probe catches a 12x12 control', fixture.includes('small'))
+  check('Target probe catches a 30x10 control', fixture.includes('short'))
+  check('Target probe sweeps textareas too', fixture.includes('area'))
+  check('Target probe clears a control exactly 24px across', !fixture.includes('exact'))
+  check('Target probe counts an ::after overlay as target area', !fixture.includes('padded'))
   for (const [route, width, height] of [
     ['/', 390, 844], ['/', 1440, 1100],
     ['/guides', 390, 844], ['/guides/share-calendar', 390, 844],
@@ -409,51 +438,9 @@ try {
     await targetPage.goto(base + route)
     await targetPage.evaluate(() => document.fonts.ready)
     if (route === '/app-simulator') await targetPage.locator('.sim-device').waitFor()
-    const undersized = await targetPage.evaluate(() => {
-      const isHit = (x, y, el) => {
-        if (x < 0 || y < 0 || x > innerWidth - 1 || y > innerHeight - 1) return false
-        const top = document.elementFromPoint(x, y)
-        return !!top && (top === el || el.contains(top))
-      }
-      // Sticky chrome would otherwise shield the controls beneath it, and the site
-      // scrolls smoothly, so programmatic scrolls must be forced to instant.
-      const chrome = document.createElement('style')
-      chrome.textContent = '.site-header,.download-bar,.announcement-banner,.guide-progress,.article-sidebar{position:static!important}'
-      document.head.appendChild(chrome)
-      const device = document.querySelector('.sim-device')
-      const mockIsScaled = !!device && getComputedStyle(device).transform !== 'none'
-      const undersized = []
-      for (const el of document.querySelectorAll('a[href], button, [role="button"], input, select, [tabindex]:not([tabindex="-1"])')) {
-        if (el.disabled) continue
-        // A scaled phone mock reports its presentation size, not the authored one.
-        if (mockIsScaled && el.closest('.sim-device')) continue
-        const style = getComputedStyle(el)
-        if (style.visibility === 'hidden' || style.display === 'none' || style.opacity === '0') continue
-        if (!el.getBoundingClientRect().height) continue
-        el.scrollIntoView({ block: 'center', behavior: 'instant' })
-        let best = null
-        for (const offset of [0, 120, -120, 260, -260]) {
-          if (offset) window.scrollBy({ top: offset, behavior: 'instant' })
-          const rect = el.getBoundingClientRect()
-          if (!rect.width || !rect.height) break
-          const cx = Math.round(rect.left + rect.width / 2), cy = Math.round(rect.top + rect.height / 2)
-          if (!isHit(cx, cy, el)) continue
-          let left = 0, right = 0, up = 0, down = 0
-          while (left < 80 && isHit(Math.round(rect.left) - left - 1, cy, el)) left += 1
-          while (right < 80 && isHit(Math.round(rect.right) + right, cy, el)) right += 1
-          while (up < 80 && isHit(cx, Math.round(rect.top) - up - 1, el)) up += 1
-          while (down < 80 && isHit(cx, Math.round(rect.bottom) + down, el)) down += 1
-          const box = { width: rect.width + left + right, height: rect.height + up + down }
-          if (!best || box.width * box.height > best.width * best.height) best = box
-          if (box.width >= 24 && box.height >= 24) break
-        }
-        if (best && (best.width < 24 || best.height < 24)) undersized.push(`${Math.round(best.width)}x${Math.round(best.height)} ${el.tagName.toLowerCase()} "${(el.getAttribute('aria-label') || el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 40)}"`)
-      }
-      chrome.remove()
-      return undersized
-    })
+    const undersized = (await measureTargets(targetPage)).filter(item => item.undersized)
     check(`Every target is at least 24x24 on ${route} at ${width}x${height}`, undersized.length === 0)
-    if (undersized.length) console.log('  undersized:', undersized)
+    if (undersized.length) console.log('  undersized:', undersized.map(describeTarget))
   }
   await targetPage.close()
   console.log('RESULT:', failures.length ? failures : 'All checks passed')

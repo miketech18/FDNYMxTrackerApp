@@ -1,6 +1,6 @@
 // Audits WCAG 2.5.8 (target size, minimum 24x24 CSS px) across every route.
 //
-// The measured box is the real hit region, not the element's own rect: controls
+// The measured box is the real hit region, not the element's rect: controls
 // are allowed to grow their target with padding or an ::after overlay, and this
 // probe discovers that by pushing elementFromPoint outward from the centre.
 //
@@ -14,13 +14,17 @@
 // Controls inside the phone mock are skipped when the mock is transform-scaled:
 // a scale reports presentation size, and the mock is an illustration of the app
 // rather than the app UI itself. scripts/test.mjs enforces the same rule in CI.
+//
+// The measurement lives in scripts/tap-targets.mjs so this audit and the CI
+// guard cannot disagree about what counts as a target or how big it is.
 
 import { createServer } from 'node:http'
 import { readFile, stat } from 'node:fs/promises'
 import { resolve, extname } from 'node:path'
 import { chromium } from '@playwright/test'
+import { measureTargets, MIN_TARGET } from './tap-targets.mjs'
 
-const MIN = 24
+const MIN = MIN_TARGET
 const ROUTES = (process.env.AUDIT_ROUTES ? process.env.AUDIT_ROUTES.split(',') : ['/', '/guides', '/guides/share-calendar', '/guides/overtime-equalization', '/app-simulator'])
 const VIEWPORTS = process.env.AUDIT_VIEWPORTS
   ? process.env.AUDIT_VIEWPORTS.split(',').map(v => { const [name, width, height] = v.split(':'); return { name, width: +width, height: +height } })
@@ -29,6 +33,9 @@ const VIEWPORTS = process.env.AUDIT_VIEWPORTS
       { name: 'desktop', width: 1440, height: 900 },
       { name: 'full', width: 1440, height: 1100 }
     ]
+
+const hit = (item) => `${Math.round(item.width)}x${Math.round(item.height)}`.padStart(9)
+const layout = (item) => `${Math.round(item.layoutWidth)}x${Math.round(item.layoutHeight)}`.padStart(9)
 
 const root = resolve('dist')
 let server
@@ -49,77 +56,6 @@ if (!base) {
   base = `http://127.0.0.1:${server.address().port}`
 }
 
-// Runs in the page. Sticky chrome is switched to static first so it cannot
-// shield the controls underneath it from the hit probe.
-const measureInPage = (min) => {
-  const isHit = (x, y, el) => {
-    if (x < 0 || y < 0 || x > window.innerWidth - 1 || y > window.innerHeight - 1) return false
-    const top = document.elementFromPoint(x, y)
-    return !!top && (top === el || el.contains(top))
-  }
-  const boxOf = (el) => {
-    const rect = el.getBoundingClientRect()
-    if (!rect.width || !rect.height) return null
-    const cx = Math.round(rect.left + rect.width / 2)
-    const cy = Math.round(rect.top + rect.height / 2)
-    if (!isHit(cx, cy, el)) return null
-    let left = 0, right = 0, up = 0, down = 0
-    while (left < 80 && isHit(Math.round(rect.left) - left - 1, cy, el)) left++
-    while (right < 80 && isHit(Math.round(rect.right) + right, cy, el)) right++
-    while (up < 80 && isHit(cx, Math.round(rect.top) - up - 1, el)) up++
-    while (down < 80 && isHit(cx, Math.round(rect.bottom) + down, el)) down++
-    return {
-      width: rect.width + left + right,
-      height: rect.height + up + down,
-      layout: { width: rect.width, height: rect.height }
-    }
-  }
-  const chrome = document.createElement('style')
-  chrome.textContent = '.site-header,.download-bar,.announcement-banner,.guide-progress,.article-sidebar{position:static!important}'
-  document.head.appendChild(chrome)
-
-  const device = document.querySelector('.sim-device')
-  const mockIsScaled = !!device && getComputedStyle(device).transform !== 'none'
-
-  const selector = 'a[href], button, [role="button"], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-  const results = []
-  for (const el of document.querySelectorAll(selector)) {
-    const style = getComputedStyle(el)
-    if (style.visibility === 'hidden' || style.display === 'none' || style.opacity === '0') continue
-    if (el.disabled) continue
-    if (mockIsScaled && el.closest('.sim-device')) continue
-    if (!el.getBoundingClientRect().height) continue
-    const path = []
-    let node = el
-    while (node && node !== document.body) {
-      const cls = typeof node.className === 'string' && node.className ? '.' + node.className.trim().split(/\s+/).join('.') : ''
-      path.unshift(node.tagName.toLowerCase() + cls)
-      node = node.parentElement
-    }
-    // Bring the control into view. The site sets scroll-behavior: smooth, so the
-    // behaviour has to be forced to instant or the probe races the animation and
-    // measures the control where it used to be.
-    el.scrollIntoView({ block: 'center', behavior: 'instant' })
-    let best = null
-    for (const offset of [0, 120, -120, 260, -260]) {
-      if (offset) window.scrollBy({ top: offset, behavior: 'instant' })
-      const box = boxOf(el)
-      if (!box) continue
-      if (!best || box.width * box.height > best.width * best.height) best = box
-      if (box.width >= min && box.height >= min) break
-    }
-    if (!best) continue
-    results.push({
-      path: path.join(' > '),
-      text: (el.getAttribute('aria-label') || el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 46),
-      hit: `${Math.round(best.width)}x${Math.round(best.height)}`,
-      layout: `${Math.round(best.layout.width)}x${Math.round(best.layout.height)}`,
-      short: best.width < min || best.height < min
-    })
-  }
-  return results
-}
-
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] })
 const findings = []
 try {
@@ -132,12 +68,12 @@ try {
       if (route === '/app-simulator') await page.locator('.sim-device').waitFor()
       await page.locator('#root a, #root button').first().waitFor()
       await page.waitForTimeout(150)
-      const results = await page.evaluate(measureInPage, MIN)
-      const short = results.filter(r => r.short)
-      if (process.env.AUDIT_ALL) for (const item of results) console.log(`    (all) ${item.hit.padStart(9)}  "${item.text}"`)
+      const results = await measureTargets(page)
+      const short = results.filter(r => r.undersized)
+      if (process.env.AUDIT_ALL) for (const item of results) console.log(`    (all) ${hit(item)}  "${item.text}"`)
       if (short.length) findings.push({ viewport: viewport.name, route, short })
       console.log(`${viewport.name.padEnd(7)} ${route.padEnd(32)} ${String(results.length).padStart(3)} controls, ${short.length} under ${MIN}px`)
-      for (const item of short) console.log(`    ${item.hit.padStart(9)}  layout ${item.layout.padStart(9)}  "${item.text}"  ${item.path.slice(0, 90)}`)
+      for (const item of short) console.log(`    ${hit(item)}  layout ${layout(item)}  "${item.text}"  ${item.path.slice(0, 90)}`)
     }
     await page.close()
   }
