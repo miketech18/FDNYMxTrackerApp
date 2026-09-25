@@ -45,6 +45,14 @@
 .sim-app-header > div { display: flex; align-items: center; gap: 8px; }
 .sim-app-header h2 { font: 400 34px/1.1 'Bebas Neue', sans-serif; letter-spacing: .9px; flex: 1; outline: none; }
 .sim-app-header p { font: 10px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: 1.5px; color: var(--sim-muted); margin-top: 7px; }
+.sim-app-header.sim-app-settings > div { margin-top: 3px; }
+.sim-app-header.sim-app-settings .sim-kicker { color: var(--sim-gold); letter-spacing: 1.6px; }
+.sim-app-header.sim-app-settings > p { display: flex; align-items: center; gap: 7px; }
+.sim-status-live { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #38b26a; box-shadow: 0 0 6px #38b26a66; }
+.sim-app-header.sim-app-subpage h2 { text-align: center; }
+.sim-app-header.sim-app-subpage > p { display: none; }
+.sim-back-danger { color: #ff978d; }
+.sim-back-danger:hover { color: #ffb3ab; background: #e84c3d14; }
 .sim-notification-dot { position: absolute; width: 5px; height: 5px; right: 11px; top: 8px; border-radius: 50%; background: var(--sim-red); }
 .sim-screen { height: 588px; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: #3b3b43 transparent; padding: 15px 13px 24px; position: relative; display: flex; flex-direction: column; gap: 14px; }
 .sim-screen > * { flex-shrink: 0; }
@@ -153,6 +161,41 @@
 .sim-accordion[open] > summary > svg { transform: rotate(90deg); }
 .sim-accordion-body { padding: 0 12px 14px; display: grid; gap: 10px; }
 .sim-accordion .sim-panel { background: #141418; }
+/* Settings tab — mirrors the real app's configuration screen: numbered accordion
+   rows, status badges, gold-striped expanded panels, and monospace titles. */
+.simx-section { border-bottom: 1px solid var(--sim-border); background: transparent; }
+.simx-section > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px; padding: 15px 2px; }
+.simx-section > summary::-webkit-details-marker { display: none; }
+.simx-section-text { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.simx-section-title { font: 700 13px/1.35 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .8px; color: #f5f5f5; }
+.simx-section-title b { color: var(--sim-gold); }
+.simx-section-text small { font-size: 10px; color: #8e8e99; line-height: 1.5; }
+.simx-badge { flex-shrink: 0; font: 700 8px/1 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .8px; padding: 5px 7px; border-radius: 4px; border: 1px solid; }
+.simx-badge.is-green { color: #58d68d; border-color: #38b26a55; background: #38b26a12; }
+.simx-badge.is-gold { color: #e3c17b; border-color: #d4a94e55; background: #d4a94e10; }
+.simx-badge.is-red { color: #ff978d; border-color: #e84c3d55; background: #e84c3d12; }
+.simx-badge.is-plain { color: #aaaab1; border-color: #ffffff26; background: #ffffff07; }
+.simx-chevron { flex-shrink: 0; color: #8e8e99; transition: transform .15s; }
+.simx-section[open] .simx-chevron { transform: rotate(180deg); }
+.simx-body { display: grid; gap: 2px; margin: 2px 0 12px; border-radius: 10px; background: #131317; border-left: 2px solid var(--sim-gold); padding: 4px 10px 10px; overflow: hidden; }
+.simx-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: transparent; border: 0; border-bottom: 1px solid var(--sim-border, #ffffff17); color: #e5e5eb; padding: 11px 2px; }
+.simx-row:hover { background: #ffffff05; }
+.simx-row-lead { display: inline-flex; color: var(--sim-gold); flex-shrink: 0; }
+.simx-row.is-danger .simx-row-lead, .simx-row.is-danger .simx-row-text strong { color: #ff978d; }
+.simx-row-text { flex: 1; min-width: 0; }
+.simx-row-text strong { display: block; font-weight: 500; font-size: 12px; line-height: 1.5; }
+.simx-row-text small { display: block; font-size: 10px; color: #8e8e99; line-height: 1.6; margin-top: 3px; }
+.simx-row-meta { font: 10px ui-monospace, SFMono-Regular, Consolas, monospace; color: #aaaab1; flex-shrink: 0; }
+.simx-row-meta.is-green { color: #58d68d; }
+.simx-row-meta.is-red { color: #ff978d; }
+.simx-row > svg { color: #8e8e99; flex-shrink: 0; }
+.simx-color-card { display: flex; align-items: center; gap: 11px; border: 1px solid var(--sim-border); border-radius: 10px; background: #1c1c22; padding: 9px 12px; }
+.simx-color-card input { width: 40px; height: 40px; padding: 0; border: 0; border-radius: 9px; background: none; flex-shrink: 0; }
+.simx-color-card span { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.simx-color-card strong { font-weight: 500; font-size: 12px; }
+.simx-color-card code { font: 9px ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .6px; color: #8e8e99; }
+.simx-color-card > svg { color: #8e8e99; flex-shrink: 0; }
+.simx-disclaimer { text-align: center; color: #8e8e99; font-size: 10px; line-height: 1.8; padding: 6px 4px 2px; }
 .sim-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: transparent; border: 0; border-bottom: 1px solid var(--sim-border, #ffffff17); color: #e5e5eb; text-align: left; padding: 14px 3px; width: 100%; font-size: 12px; }
 .sim-row small { display: block; color: #aaaab1; font-size: 10px; line-height: 1.6; margin-top: 6px; }
 .sim-row:hover { background: #ffffff05; }
@@ -197,10 +240,6 @@
 .sim-report-status p { font-size: 10px; }
 .sim-scan-card > small { display: block; margin-top: 14px; }
 .sim-search { display: grid; gap: 8px; font-size: 12px; }
-.sim-color-row { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--sim-border); padding-block: 7px; font-size: 12px; }
-.sim-color-row span { flex: 1; }
-.sim-color-row code { font-size: 10px; color: #aaaab1; }
-.sim-color-row input { width: 38px; height: 36px; padding: 0; border: 0; background: none; }
 .sim-watermark { width: 110px; height: 110px; object-fit: contain; opacity: .22; margin: 12px auto 0; }
 .sim-version { text-align: center; font: 8px monospace; color: #85858d; letter-spacing: 1px; }
 .sim-disclaimer { display: flex; align-items: flex-start; justify-content: center; gap: 9px; color: var(--steel); padding: 12px 0; }
