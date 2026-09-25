@@ -26,6 +26,6 @@ export function PhoneCarousel() {
         return <div key={`${position}-${screen.id}`} className={`phone phone-position-${position}`} aria-hidden={position !== 0}><div className="phone-frame"><div className="phone-notch" /><img src={`/images/screen-${screen.id}.webp`} alt={screen.label} draggable="false" /></div></div>
       })}
     </div>
-    <div className="carousel-controls"><button onClick={() => move(-1)} aria-label="Previous app screenshot"><ArrowLeft size={16} /></button><div className="carousel-center"><p aria-live="polite">{screens[active].label}</p><div className="carousel-dots">{screens.map((screen, index) => <button key={screen.id} className={active === index ? 'active' : ''} onClick={() => setActive(index)} aria-label={`Show ${screen.label.toLowerCase()}`} aria-current={active === index ? 'true' : undefined} />)}</div></div><button onClick={() => move(1)} aria-label="Next app screenshot"><ArrowRight size={16} /></button></div>
+    <div className="carousel-controls"><button onClick={() => move(-1)} aria-label="Previous app screenshot"><ArrowLeft size={16} /></button><div className="carousel-center"><p aria-live="polite"><span className="sr-only">{`Screen ${active + 1} of ${screens.length}: `}</span>{screens[active].label}</p><div className="carousel-dots" aria-hidden="true">{screens.map((screen, index) => <span key={screen.id} className={active === index ? 'active' : ''} />)}</div></div><button onClick={() => move(1)} aria-label="Next app screenshot"><ArrowRight size={16} /></button></div>
   </div>
 }

@@ -31,7 +31,9 @@ try {
   check('Hero screens load', await page.locator('.phone-frame img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)))
   check('Features section removed; locator follows pocket field guide', await page.locator('.features-section').count() === 0 && await page.locator('.locator-rotator').isVisible())
   await page.getByRole('button', { name: 'Next app screenshot' }).click()
-  check('Carousel advances', await page.locator('.carousel-center p').textContent() === 'Your entire tour, at a glance')
+  check('Carousel advances', await page.locator('.carousel-center p').textContent().then(text => text.includes('Your entire tour, at a glance')))
+  check('Carousel reports screen position to assistive tech', await page.locator('.carousel-center p').textContent().then(text => /Screen 2 of 13/.test(text)))
+  check('Carousel dots are indicators, not targets', await page.locator('.carousel-dots button').count() === 0 && await page.locator('.carousel-dots span').count() === 13)
   await page.getByRole('button', { name: 'Previous app screenshot' }).click()
   await page.getByRole('button', { name: 'How-to guides' }).click()
   check('Guide menu expands', await page.locator('#guide-dropdown').isVisible())
@@ -392,6 +394,68 @@ try {
   }
   check('Simulator makes no external requests', externalRequests.length === 0)
   check('Simulator makes no backend requests', backendRequests.length === 0)
+  // WCAG 2.5.8 target size: every control must offer a 24x24 CSS px hit region.
+  // The widget is measured by pushing elementFromPoint outward from the control's
+  // centre, so padding and ::after overlays count as target area.
+  const targetPage = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 })
+  targetPage.on('pageerror', error => failures.push(error.message))
+  for (const [route, width, height] of [
+    ['/', 390, 844], ['/', 1440, 1100],
+    ['/guides', 390, 844], ['/guides/share-calendar', 390, 844],
+    ['/guides/overtime-equalization', 390, 844],
+    ['/app-simulator', 390, 844], ['/app-simulator', 1440, 1100]
+  ]) {
+    await targetPage.setViewportSize({ width, height })
+    await targetPage.goto(base + route)
+    await targetPage.evaluate(() => document.fonts.ready)
+    if (route === '/app-simulator') await targetPage.locator('.sim-device').waitFor()
+    const undersized = await targetPage.evaluate(() => {
+      const isHit = (x, y, el) => {
+        if (x < 0 || y < 0 || x > innerWidth - 1 || y > innerHeight - 1) return false
+        const top = document.elementFromPoint(x, y)
+        return !!top && (top === el || el.contains(top))
+      }
+      // Sticky chrome would otherwise shield the controls beneath it, and the site
+      // scrolls smoothly, so programmatic scrolls must be forced to instant.
+      const chrome = document.createElement('style')
+      chrome.textContent = '.site-header,.download-bar,.announcement-banner,.guide-progress,.article-sidebar{position:static!important}'
+      document.head.appendChild(chrome)
+      const device = document.querySelector('.sim-device')
+      const mockIsScaled = !!device && getComputedStyle(device).transform !== 'none'
+      const undersized = []
+      for (const el of document.querySelectorAll('a[href], button, [role="button"], input, select, [tabindex]:not([tabindex="-1"])')) {
+        if (el.disabled) continue
+        // A scaled phone mock reports its presentation size, not the authored one.
+        if (mockIsScaled && el.closest('.sim-device')) continue
+        const style = getComputedStyle(el)
+        if (style.visibility === 'hidden' || style.display === 'none' || style.opacity === '0') continue
+        if (!el.getBoundingClientRect().height) continue
+        el.scrollIntoView({ block: 'center', behavior: 'instant' })
+        let best = null
+        for (const offset of [0, 120, -120, 260, -260]) {
+          if (offset) window.scrollBy({ top: offset, behavior: 'instant' })
+          const rect = el.getBoundingClientRect()
+          if (!rect.width || !rect.height) break
+          const cx = Math.round(rect.left + rect.width / 2), cy = Math.round(rect.top + rect.height / 2)
+          if (!isHit(cx, cy, el)) continue
+          let left = 0, right = 0, up = 0, down = 0
+          while (left < 80 && isHit(Math.round(rect.left) - left - 1, cy, el)) left += 1
+          while (right < 80 && isHit(Math.round(rect.right) + right, cy, el)) right += 1
+          while (up < 80 && isHit(cx, Math.round(rect.top) - up - 1, el)) up += 1
+          while (down < 80 && isHit(cx, Math.round(rect.bottom) + down, el)) down += 1
+          const box = { width: rect.width + left + right, height: rect.height + up + down }
+          if (!best || box.width * box.height > best.width * best.height) best = box
+          if (box.width >= 24 && box.height >= 24) break
+        }
+        if (best && (best.width < 24 || best.height < 24)) undersized.push(`${Math.round(best.width)}x${Math.round(best.height)} ${el.tagName.toLowerCase()} "${(el.getAttribute('aria-label') || el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 40)}"`)
+      }
+      chrome.remove()
+      return undersized
+    })
+    check(`Every target is at least 24x24 on ${route} at ${width}x${height}`, undersized.length === 0)
+    if (undersized.length) console.log('  undersized:', undersized)
+  }
+  await targetPage.close()
   console.log('RESULT:', failures.length ? failures : 'All checks passed')
 } finally { await browser.close(); server.close() }
 if (failures.length) process.exitCode = 1
