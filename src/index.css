@@ -1,11 +1,10 @@
 @import "tailwindcss";
 
-@font-face { font-family: 'Bebas Neue'; src: url('/fonts/bebas-neue-0.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
-@font-face { font-family: 'Inter'; src: url('/fonts/inter-0.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
-@font-face { font-family: 'Inter'; src: url('/fonts/inter-1.woff2') format('woff2'); font-style: normal; font-weight: 500; font-display: swap; }
-@font-face { font-family: 'Inter'; src: url('/fonts/inter-2.woff2') format('woff2'); font-style: normal; font-weight: 600; font-display: swap; }
-@font-face { font-family: 'Inter'; src: url('/fonts/inter-3.woff2') format('woff2'); font-style: normal; font-weight: 700; font-display: swap; }
-@font-face { font-family: 'Inter'; src: url('/fonts/inter-4.woff2') format('woff2'); font-style: normal; font-weight: 800; font-display: swap; }
+/* One subset of each face, cut to the characters this site renders and kept up
+   to date with `npm run fonts` — see scripts/subset-fonts.mjs. Inter is served
+   as a variable font so 400–800 (and the 650/550 accents) share a single file. */
+@font-face { font-family: 'Bebas Neue'; src: url('/fonts/bebas-neue.woff2') format('woff2'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('/fonts/inter-var.woff2') format('woff2'); font-style: normal; font-weight: 400 800; font-display: swap; }
 
 :root { font-family: 'Inter', Arial, sans-serif; color: #f4f1ea; background: #080c12; font-synthesis: none; --night: #080c12; --panel: #111922; --steel: #94a1b1; --cream: #f4f1ea; --red: #ce1126; --brass: #d4a43d; --line: #ffffff14; }
 html { scroll-behavior: smooth; scroll-padding-top: 101px; }

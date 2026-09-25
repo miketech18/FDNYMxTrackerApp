@@ -16,9 +16,8 @@ const destination = resolve(root, 'images/og-card.jpg')
 const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8" />
 <style>
-  @font-face { font-family: 'Bebas Neue'; src: url('/fonts/bebas-neue-0.woff2') format('woff2'); font-weight: 400; }
-  @font-face { font-family: 'Inter'; src: url('/fonts/inter-0.woff2') format('woff2'); font-weight: 400; }
-  @font-face { font-family: 'Inter'; src: url('/fonts/inter-3.woff2') format('woff2'); font-weight: 700; }
+  @font-face { font-family: 'Bebas Neue'; src: url('/fonts/bebas-neue.woff2') format('woff2'); font-weight: 400; }
+  @font-face { font-family: 'Inter'; src: url('/fonts/inter-var.woff2') format('woff2'); font-weight: 400 800; }
   * { margin: 0; box-sizing: border-box; }
   body {
     width: 1200px; height: 630px; display: flex; align-items: center; gap: 56px;

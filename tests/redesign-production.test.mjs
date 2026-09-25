@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict'
 import { readFile, readdir } from 'node:fs/promises'
 import test from 'node:test'
+import {
+  SYSTEM_FALLBACK_CHARACTERS,
+  collectSiteCharacters,
+  inspectFont,
+} from '../scripts/font-coverage.mjs'
 
 const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8')
 
@@ -160,11 +165,38 @@ test('the overtime equalization guide includes the simulator states and persiste
   assert.match(overtimeGuide, /localStorage\.setItem/)
 })
 
-test('self-hosted WOFF2 fonts declare the correct format', async () => {
+test('the self-hosted fonts are real WOFF2, are all referenced, and cover the copy', async () => {
   const css = await read('src/index.css')
+  const fontsDir = new URL('../public/fonts/', import.meta.url)
+  const shipped = (await readdir(fontsDir)).filter(file => file.endsWith('.woff2'))
 
-  assert.doesNotMatch(css, /\.woff2'\) format\('truetype'\)/)
   assert.match(css, /\.woff2'\) format\('woff2'\)/)
+  assert.doesNotMatch(css, /\.woff2'\) format\('truetype'\)/)
+  assert.ok(shipped.length > 0, 'expected at least one self-hosted font')
+
+  // Nothing may point at a missing file, and nothing may ship unreferenced, so a
+  // rename cannot quietly leave the site rendering in the fallback face.
+  const referenced = [...css.matchAll(/url\('\/fonts\/([\w.-]+)'\)/g)].map(match => match[1])
+  assert.deepEqual([...referenced].sort(), [...shipped].sort(), 'src/index.css and public/fonts must agree')
+
+  let total = 0
+  const covered = new Set()
+  for (const file of shipped) {
+    // inspectFont throws when the file is not genuine WOFF2, which is exactly the
+    // regression this guards: renamed TrueType does not compress or subset.
+    const font = await inspectFont(new URL(file, fontsDir))
+    total += font.bytes
+    for (const point of font.points) covered.add(point)
+  }
+
+  // The full-charset Inter files this replaced were 318 KB each, 1.6 MB together.
+  assert.ok(total < 150 * 1024, `self-hosted fonts total ${(total / 1024).toFixed(1)} KB; expected under 150 KB`)
+
+  const { characters } = await collectSiteCharacters(new URL('../', import.meta.url))
+  const missing = characters.filter(
+    character => !SYSTEM_FALLBACK_CHARACTERS.includes(character) && !covered.has(character.codePointAt(0)),
+  )
+  assert.deepEqual(missing, [], `characters the site renders but no font can draw: ${missing.join(' ')}`)
 })
 
 test('the release version is stated once, in the site header', async () => {
