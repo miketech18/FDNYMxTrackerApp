@@ -1,11 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile, readdir } from 'node:fs/promises'
 import test from 'node:test'
-import {
-  SYSTEM_FALLBACK_CHARACTERS,
-  collectSiteCharacters,
-  inspectFont,
-} from '../scripts/font-coverage.mjs'
+import { collectSiteCharacters, inspectFont } from '../scripts/font-coverage.mjs'
 
 const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8')
 
@@ -192,10 +188,10 @@ test('the self-hosted fonts are real WOFF2, are all referenced, and cover the co
   // The full-charset Inter files this replaced were 318 KB each, 1.6 MB together.
   assert.ok(total < 150 * 1024, `self-hosted fonts total ${(total / 1024).toFixed(1)} KB; expected under 150 KB`)
 
+  // No exceptions: every character the source tree can render must come from a
+  // shipped face, so nothing silently falls back to a system font.
   const { characters } = await collectSiteCharacters(new URL('../', import.meta.url))
-  const missing = characters.filter(
-    character => !SYSTEM_FALLBACK_CHARACTERS.includes(character) && !covered.has(character.codePointAt(0)),
-  )
+  const missing = characters.filter(character => !covered.has(character.codePointAt(0)))
   assert.deepEqual(missing, [], `characters the site renders but no font can draw: ${missing.join(' ')}`)
 })
 

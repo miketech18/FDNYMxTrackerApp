@@ -14,11 +14,7 @@ import { mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import subsetFont from 'subset-font'
-import {
-  SYSTEM_FALLBACK_CHARACTERS,
-  collectSiteCharacters,
-  inspectFont,
-} from './font-coverage.mjs'
+import { collectSiteCharacters, inspectFont } from './font-coverage.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const outDir = path.join(root, 'public/fonts')
@@ -57,8 +53,7 @@ async function existingFontBytes() {
 }
 
 const { characters, text, files: scanned } = await collectSiteCharacters(new URL('../', import.meta.url))
-const required = characters.filter(character => !SYSTEM_FALLBACK_CHARACTERS.includes(character))
-console.log(`scanned ${scanned} source files → ${characters.length} characters, ${required.length} of them require a webfont glyph`)
+console.log(`scanned ${scanned} source files → ${characters.length} characters, every one of which must be covered`)
 
 const before = await existingFontBytes()
 await mkdir(outDir, { recursive: true })
@@ -98,7 +93,7 @@ for (const { source } of written) {
   console.log(`  ${source.output}: ${font.points.size} codepoints, ${font.tables.length} tables, axes: ${axes}`)
 }
 
-const missing = required.filter(character => !covered.has(character.codePointAt(0)))
+const missing = characters.filter(character => !covered.has(character.codePointAt(0)))
 if (missing.length > 0) {
   failed = true
   console.error(`\n✗ the subset cannot render: ${missing.join(' ')}`)
@@ -107,8 +102,5 @@ if (missing.length > 0) {
 
 const after = written.reduce((total, entry) => total + entry.subset, 0)
 console.log(`\npublic/fonts: ${kilobytes(before)} → ${kilobytes(after)} (${(100 - (after / before) * 100).toFixed(1)}% smaller)`)
-if (SYSTEM_FALLBACK_CHARACTERS.length > 0) {
-  console.log(`drawn by the system fallback on every platform: ${[...SYSTEM_FALLBACK_CHARACTERS].join(' ')}`)
-}
 
 if (failed) process.exitCode = 1

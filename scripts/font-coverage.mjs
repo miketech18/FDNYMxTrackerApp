@@ -17,13 +17,6 @@ import fontverter from 'fontverter'
  */
 export const WOFF2_MAGIC = 'wOF2'
 
-/**
- * Characters in the copy that Inter has never contained, so they are drawn by
- * the system fallback font on every platform — before and after subsetting.
- * These are the block elements in the simulator's fake status bar.
- */
-export const SYSTEM_FALLBACK_CHARACTERS = '▮▰'
-
 const SOURCE_SUFFIXES = new Set(['.ts', '.tsx', '.css', '.html', '.json'])
 
 /**
