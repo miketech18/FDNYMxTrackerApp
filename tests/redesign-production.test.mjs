@@ -201,8 +201,8 @@ test('the release version is stated once, in the site header', async () => {
     read('src/components/Layout.tsx'),
   ])
 
-  assert.match(layout, /4\.9\.5/, 'the header release badge must show version 4.9.5')
-  assert.doesNotMatch(home, /4\.9\.5/, 'the homepage must not repeat the version label')
+  assert.match(layout, /4\.11\.7/, 'the header release badge must show version 4.11.7')
+  assert.doesNotMatch(home, /4\.11\.7/, 'the homepage must not repeat the version label')
   assert.doesNotMatch(layout, /4\.6\.0/, 'the site must not show version 4.6.0')
 })
 
