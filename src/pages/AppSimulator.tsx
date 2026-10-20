@@ -408,8 +408,8 @@ export function AppSimulator() {
         <SettingsRow title="Import / Restore Data" subtitle="Restore from a demo file" lead={<Cloud size={15} />} icon={<ChevronRight size={15} />} onClick={() => info('Import / Restore · demo', 'This preview does not import records. Reset demo restores the fictional sample.')} />
         <Accordion title="ADVANCED"><div>{row('Reset demo data', () => setModal({ kind: 'reset' }), 'Restore the original fictional sample')}</div></Accordion>
       </SettingsSection>
-      <SettingsSection title="05 ABOUT & SUPPORT" subtitle="Version, legal & account" badge="v4.12.0" tone="plain">
-        <SettingsRow title="App Version" subtitle="FDNY Mutual Tracker · interactive demo" meta="4.12.0" lead={<Info size={15} />} onClick={() => info('App version', 'Version 4.12.0 · Interactive demo. Not affiliated with the FDNY or City of New York.')} />
+      <SettingsSection title="05 ABOUT & SUPPORT" subtitle="Version, legal & account" badge="v4.13.3" tone="plain">
+        <SettingsRow title="App Version" subtitle="FDNY Mutual Tracker · interactive demo" meta="4.13.3" lead={<Info size={15} />} onClick={() => info('App version', 'Version 4.13.3 · Interactive demo. Not affiliated with the FDNY or City of New York.')} />
         <SettingsRow title="Terms of Use" subtitle="Demo license & limitations" lead={<FileText size={15} />} icon={<ChevronRight size={15} />} onClick={() => info('Terms of Use', 'The full app’s terms apply on the App Store. This simulator is an independent demo with fictional data.')} />
         <SettingsRow title="Privacy Policy" subtitle="What the demo stores" lead={<Lock size={15} />} icon={<ChevronRight size={15} />} onClick={() => info('Privacy Policy', 'Demo data stays in this browser’s local storage. No accounts, analytics, or personal data.')} />
         <SettingsRow title="View subscription preview" subtitle="Annual plan & 7-day trial" lead={<Flame size={15} />} icon={<ChevronRight size={15} />} onClick={() => setModal({ kind: 'paywall' })} />
@@ -420,7 +420,7 @@ export function AppSimulator() {
         <SettingsRow title="Send Feedback" subtitle="Feature ideas & bug reports" lead={<MessageSquare size={15} />} icon={<ChevronRight size={15} />} onClick={() => info('Feedback · demo', 'No message will be sent from this simulator. Use the website’s Send feedback button outside the phone if you want to contact the developer.')} />
         <SettingsRow title="Share the App" subtitle="Invite crew to the demo" lead={<Share2 size={15} />} icon={<ChevronRight size={15} />} onClick={() => info('Share the demo', 'Visitors can explore this same fictional app at /app-simulator. Browser-local changes are never shared.')} />
       </SettingsSection>
-      <img className="sim-watermark" src="/images/app-icon.webp" alt="" /><p className="sim-version">FDNY MUTUAL TRACKER · v4.12.0</p>
+      <img className="sim-watermark" src="/images/app-icon.webp" alt="" /><p className="sim-version">FDNY MUTUAL TRACKER · v4.13.3</p>
     </>
   }
   const detail = modal?.kind === 'detail' ? data.entries.find(e => e.id === modal.id) : undefined
