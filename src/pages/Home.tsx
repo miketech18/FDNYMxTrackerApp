@@ -37,7 +37,7 @@ export function Home({ onFeedback }: { onFeedback: () => void }) {
 }
 
 function LocatorRotator() {
-  const { index, setIndex, setPaused } = useRotator(2)
+  const { index, setIndex, setPaused } = useRotator(3)
   return (
     <section
       className="locator-rotator"
@@ -72,14 +72,25 @@ function LocatorRotator() {
             <div className="locator-image"><img src="/images/screen-13.webp" alt="Vacation Lookup showing vacation sets by seniority" loading="lazy" /></div>
           </div>
         </div>
+        <div className={`locator-card ${index === 2 ? 'is-active' : 'is-hidden'}`} aria-hidden={index !== 2}>
+          <div className="locator-panel locator-panel--mutual">
+            <div className="locator-copy">
+              <span className="small-icon"><ArrowLeftRight size={22} /></span>
+              <p className="eyebrow">NEED A MUTUAL?</p>
+              <h2>SEND MUTUALS WITH A LONG PRESS.</h2>
+              <p>Send your MX partner the next sets for approval, or post a tour off on the Mutual Board.</p>
+            </div>
+            <div className="locator-image"><img src="/images/long-press-mutuals.webp" alt="Long-press menu on a calendar day with Create Board Post for MX Off and Send Set to MX Partner" loading="lazy" /></div>
+          </div>
+        </div>
       </div>
       <div className="locator-rotator-dots" role="tablist" aria-label="Choose feature">
-        {[0, 1].map(i => (
+        {[0, 1, 2].map(i => (
           <button
             key={i}
             role="tab"
             aria-selected={index === i}
-            aria-label={i === 0 ? 'Show Take it on the hop' : 'Show Vacation Lookup'}
+            aria-label={['Show Take it on the hop', 'Show Vacation Lookup', 'Show Send mutuals with a long press'][i]}
             className={index === i ? 'is-active' : ''}
             onClick={() => setIndex(i)}
           />
